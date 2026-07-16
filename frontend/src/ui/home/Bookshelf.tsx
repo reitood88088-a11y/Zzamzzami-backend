@@ -11,8 +11,6 @@ interface BookshelfProps {
 }
 
 export default function Bookshelf({ subject, diaries, isEven }: BookshelfProps) {
-  if (diaries.length === 0) return null;
-
   return (
     <div
       className={clsx(
@@ -30,14 +28,22 @@ export default function Bookshelf({ subject, diaries, isEven }: BookshelfProps) 
       </div>
 
       {/* 책 리스트 가로 스와이프 (Peeking UI 적용) */}
-      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory px-6 pb-2 no-scrollbar">
-        {diaries.map((diary) => (
-          <div key={diary.id} className="snap-start snap-always">
-            <DiaryCard diary={diary} />
+      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory px-6 pb-2 no-scrollbar min-h-[140px] items-center">
+        {diaries.length > 0 ? (
+          <>
+            {diaries.map((diary) => (
+              <div key={diary.id} className="snap-start snap-always">
+                <DiaryCard diary={diary} />
+              </div>
+            ))}
+            {/* 마지막 카드 우측 여백 (Peeking UI 확보를 위함) */}
+            <div className="w-[8px] flex-shrink-0" />
+          </>
+        ) : (
+          <div className="w-full text-center text-[#888888] text-[14px]">
+            아직 스캔된 자료가 없습니다.
           </div>
-        ))}
-        {/* 마지막 카드 우측 여백 (Peeking UI 확보를 위함) */}
-        <div className="w-[8px] flex-shrink-0" />
+        )}
       </div>
     </div>
   );
