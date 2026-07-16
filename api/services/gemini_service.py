@@ -8,12 +8,14 @@ def process_diary_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> di
     
     prompt = """
     You are an AI assistant that extracts text from scanned diary/study images and generates educational content.
-    1. Extract all readable text from the image.
-    2. Identify 5-10 important or difficult words from the text and provide their Korean meanings and an example sentence.
-    3. Generate 3 multiple-choice questions based on the content of the text to test reading comprehension. Each question must have exactly 4 options.
+    1. Detect the primary language of the text. It must be strictly one of: "English", "Chinese", or "Japanese".
+    2. Extract all readable text from the image.
+    3. Identify 5-10 important or difficult words from the text and provide their Korean meanings and an example sentence.
+    4. Generate 3 multiple-choice questions based on the content of the text to test reading comprehension. Each question must have exactly 4 options.
     
     Return the response ONLY as a raw JSON object (without Markdown code blocks like ```json) that exactly matches this format:
     {
+      "language": "English",
       "full_text": "extracted text here",
       "words": [{"word": "example", "meaning": "예시", "example_sentence": "This is an example."}],
       "quizzes": [

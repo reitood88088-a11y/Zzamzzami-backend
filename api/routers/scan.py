@@ -27,10 +27,14 @@ async def scan_document(
             session.commit()
             session.refresh(user)
 
+        # Gemini가 판별한 언어가 있으면 우선 사용, 없으면 폼 데이터 subject(기본값) 사용
+        detected_language = result.get("language")
+        final_subject = detected_language if detected_language in ["English", "Chinese", "Japanese"] else subject
+
         # 다이어리 DB 저장
         diary = Diary(
             user_id=user.id,
-            subject=subject,
+            subject=final_subject,
             full_text=result.get("full_text", ""),
             content_snippet=result.get("full_text", "")[:50] + "..." if result.get("full_text") else "",
             is_new=True
