@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, Query
-from sqlmodel import Session
+from fastapi import APIRouter, Depends, Query, HTTPException
+from sqlmodel import Session, select
 from ..database import get_session
+from ..models import Quiz, Diary
 
 router = APIRouter(prefix="/quizzes", tags=["Quizzes"])
 
@@ -9,16 +10,22 @@ def get_quizzes(
     subject: str = Query(...),
     session: Session = Depends(get_session)
 ):
-    return {
-        "success": True,
-        "data": [
-            {
-                "quizId": "q1",
-                "diaryId": "e1",
-                "question": "다음 빈칸에 알맞은 단어는? The _____ brown fox jumps over the lazy dog.",
-                "options": ["quick", "slow", "lazy"],
-                "correctOptionIndex": 0,
-                "explanation": "quick은 '빠른'이라는 뜻으로, 문맥상 여우의 움직임을 묘사하는 데 가장 적합합니다. (스캔된 원문 기반 추출)"
-            }
-        ]
-    }
+    try:
+        query = select(Quiz, Diary).join(Diary).where(Diary.subject == subject).order_by(Quiz.created_at.desc())
+        results = session.exec(query).all()
+        
+        return {
+            "success": True,
+            "data": [
+                {
+                    "quizId": str(quiz.id),
+                    "diaryId": str(diary.id),
+                    "question": quiz.question,
+                    "options": quiz.options,
+                    "correctOptionIndex": quiz.correct_option_index,
+                    "explanation": quiz.explanation
+                } for quiz, diary in results
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
