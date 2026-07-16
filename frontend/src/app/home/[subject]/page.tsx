@@ -1,4 +1,5 @@
 import React from 'react';
+export const dynamic = 'force-dynamic';
 import DetailHeader from '../../../ui/components/DetailHeader';
 import BottomNav from '../../../ui/components/BottomNav';
 import DetailViewClient from '../../../ui/home-click/DetailViewClient';
