@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>짬짬이 - 스플래시 화면</title>
+    <!-- 폰트: Pretendard -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <!-- 아이콘: FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* 디자인 가이드라인 토큰 적용 */
+        :root {
+            --primary: #83539D; /* Royal Lilac */
+            --text-main: #1A1A1A; /* Off-Black */
+            --canvas: #FFFFFF; /* Pure White */
+            --surface-soft: #F2F2F2; /* Soft Gray */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #E5E5E5; /* 디바이스 배경 (앱 바깥 부분) */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        /* 모바일 디바이스 목업 (iPhone 13/14 비율) */
+        .mobile-container {
+            width: 390px;
+            height: 844px;
+            background-color: var(--primary); /* 브랜드 컬러 배경 */
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 8px solid var(--text-main); /* 스마트폰 베젤 */
+        }
+
+        /* 상단 상태바 (시각적 완성도를 위한 목업) */
+        .status-bar {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 47px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 28px;
+            box-sizing: border-box;
+            color: var(--canvas);
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .status-bar .icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        /* 중앙 앱 심볼 아이콘 영역 */
+        .logo-icon {
+            width: 104px;
+            height: 104px;
+            background-color: var(--canvas);
+            border-radius: 30px; /* 라운드 처리로 부드러운 느낌 (형태학적 친근감) */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1); /* 미세한 뎁스감 */
+            margin-bottom: 24px;
+        }
+
+        /* 임시 일러스트 (AI + 번뜩이는 아이디어를 상징하는 번개와 책 조합) */
+        .logo-icon i {
+            font-size: 48px;
+            color: var(--primary);
+        }
+
+        /* 타이포그래피 (디자인 가이드라인 반영) */
+        .app-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--canvas);
+            letter-spacing: -1.0px; /* 자간을 좁혀서 트렌디하게 */
+            margin: 0 0 12px 0;
+            line-height: 1.1;
+        }
+
+        .app-subtitle {
+            font-size: 18px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.85); /* 시각적 피로도를 낮추기 위한 투명도 조절 */
+            letter-spacing: -0.2px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- 스마트폰 화면 컨테이너 -->
+    <div class="mobile-container">
+        <!-- 상태바 (시간, 배터리 등) -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- 스플래시 메인 콘텐츠 -->
+        <div class="logo-icon">
+            <!-- 일러스트 이미지가 들어갈 자리 (현재는 폰트어썸 아이콘 대체) -->
+            <i class="fa-solid fa-bolt"></i> 
+        </div>
+        <h1 class="app-title">짬짬이</h1>
+        <p class="app-subtitle">찍기만 하면 끝나는 자투리 복습</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+import React from 'react';
+import { Menu, User, Signal, Wifi, Battery } from 'lucide-react';
+
+export default function GlobalHeader() {
+  return (
+    <div className="fixed top-0 left-0 w-full sm:absolute sm:top-0 sm:left-0 z-50 bg-primary flex flex-col shadow-none border-none">
+      {/* 상태 표시줄 (Status Bar) */}
+      <div className="flex justify-between items-center h-[47px] px-[28px]">
+        <span className="text-white text-[15px] font-semibold leading-normal">9:41</span>
+        <div className="flex items-center gap-[6px] text-white">
+          <Signal size={14} className="fill-white" />
+          <Wifi size={14} />
+          <Battery size={14} />
+        </div>
+      </div>
+
+      {/* 글로벌 헤더 (Header) */}
+      <header className="flex justify-between items-center py-[16px] px-[24px]">
+        {/* 왼쪽: 햄버거 메뉴 */}
+        <button className="text-white flex items-center justify-center w-[28px] h-[28px]">
+          <Menu size={28} />
+        </button>
+
+        {/* 가운데: 앱 타이틀 */}
+        <h1 className="text-white text-[22px] font-[800] tracking-[-1.0px] leading-normal absolute left-1/2 transform -translate-x-1/2">
+          짬짬이
+        </h1>
+
+        {/* 오른쪽: 프로필 버튼 */}
+        <button className="w-[36px] h-[36px] rounded-full border-2 border-white flex items-center justify-center bg-transparent text-white">
+          <User size={18} />
+        </button>
+      </header>
+    </div>
+  );
+}

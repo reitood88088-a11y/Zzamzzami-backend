@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>짬짬이 - 복습 탭 (릴스형 피드)</title>
+    <!-- 폰트: Pretendard -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <!-- 아이콘: FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* 디자인 가이드라인 토큰 엄격 적용 */
+        :root {
+            /* Colors */
+            --primary: #83539D; /* Royal Lilac */
+            --text-main: #1A1A1A; /* Off-Black */
+            --text-muted: #666666; /* Subtitle gray */
+            --canvas: #FFFFFF; /* Pure White */
+            --surface-soft: #F2F2F2; /* Soft Gray */
+            --hairline: #E5E5E5; /* Border Gray */
+            --block-cream: #F7F4EE; /* Pastel Cream */
+            
+            /* Spacing */
+            --spacing-xs: 8px;
+            --spacing-sm: 12px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            /* Radii (Shapes) */
+            --rounded-md: 8px;
+            --rounded-lg: 24px;
+            --rounded-pill: 50px;
+            --rounded-full: 9999px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #E5E5E5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Pretendard', sans-serif;
+            color: var(--text-main);
+        }
+
+        /* 모바일 디바이스 컨테이너 */
+        .mobile-container {
+            width: 390px;
+            height: 844px;
+            background-color: var(--canvas); /* 배경을 White로 변경 (요청사항) */
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 8px solid var(--text-main);
+        }
+
+        /* 상태바 및 헤더 (홈탭과 완벽하게 동일) */
+        .status-bar {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 47px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 28px;
+            box-sizing: border-box;
+            font-size: 15px;
+            font-weight: 600;
+            background-color: var(--primary);
+            color: var(--canvas); 
+            z-index: 50; 
+        }
+        .status-bar .icons { display: flex; gap: 6px; font-size: 14px; }
+
+        .header {
+            position: absolute;
+            top: 47px; 
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            box-sizing: border-box;
+            background-color: var(--primary); 
+            z-index: 50;
+        }
+        .header .menu-btn {
+            font-size: 28px;
+            color: var(--canvas);
+            cursor: pointer;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--canvas);
+            margin: 0;
+            letter-spacing: -1px;
+        }
+        .header .profile-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--rounded-full);
+            border: 2px solid var(--canvas);
+            background-color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            color: var(--canvas);
+            cursor: pointer;
+        }
+
+        /* 세로 릴스 컨테이너 */
+        .reels-container {
+            flex: 1;
+            height: 100%;
+            overflow-y: scroll; 
+            scroll-snap-type: y mandatory; 
+            scroll-behavior: smooth;
+            padding-top: 115px; /* 상태바(47) + 헤더(68) 높이만큼 여백 */
+            padding-bottom: 80px; /* 네비게이션 공간 */
+            background-color: var(--block-cream); /* 카드가 돋보이도록 파스텔 크림색 배경 적용 */
+        }
+        .reels-container::-webkit-scrollbar { display: none; }
+
+        /* 릴스 아이템 (개별 카드) */
+        .reel-item {
+            width: calc(100% - 48px); /* 좌우 24px 패딩 */
+            height: calc(100% - 40px); /* 상하단 여백을 주어 카드 형태가 잘 보이게 */
+            margin: 20px auto; 
+            background-color: var(--canvas); /* 가이드라인: 카드 배경 화이트 */
+            border: 1px solid var(--hairline); /* 가이드라인: 얇은 테두리, 그림자 없음 */
+            border-radius: var(--rounded-lg); /* 둥근 네모 24px */
+            scroll-snap-align: center; /* 스크롤 스냅 중앙 정렬 */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: var(--spacing-xl);
+            box-sizing: border-box;
+        }
+
+        /* 좌측 상단 메타 정보 (태그 및 날짜/시간) */
+        .reel-header {
+            position: absolute;
+            top: 24px; 
+            left: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .subject-badge {
+            background-color: var(--block-lilac); /* 옅은 파스텔 보라색 배경 */
+            padding: 6px 14px;
+            border-radius: var(--rounded-pill); /* 알약 형태 */
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary); /* 포인트 컬러 */
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .date-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted); /* 화이트 카드 위에서 가독성 확보를 위한 그레이 */
+            padding-left: 4px;
+        }
+
+        /* 릴스 메인 콘텐츠 (단어 및 의미) */
+        .reel-content {
+            text-align: center;
+            padding-right: 60px; /* 우측 액션 버튼 가림 방지 */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Typography: {type.headline} 토큰 */
+        .reel-content h2 {
+            font-size: 26px; 
+            font-weight: 700;
+            color: var(--primary); /* 핵심 학습 단어에 Primary 포인트 컬러 적용 */
+            margin: 0 0 16px 0;
+            letter-spacing: -0.3px;
+            line-height: 1.35;
+        }
+
+        /* Typography: {type.body} 토큰 */
+        .reel-content p {
+            font-size: 18px; 
+            font-weight: 400;
+            line-height: 1.45;
+            color: var(--text-main); /* 본문은 오프블랙으로 편안한 가독성 확보 */
+            margin: 0;
+            letter-spacing: -0.2px;
+        }
+
+        /* 우측 플로팅 액션 버튼 모음 (고정 위치) */
+        .reel-actions {
+            position: absolute;
+            bottom: 120px; /* 카드의 우측 하단쯤 위치하도록 조절 */
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+            align-items: center;
+            z-index: 40; 
+        }
+
+        .action-btn-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 48px;
+            height: 48px;
+            background-color: var(--primary); /* 버튼 내부를 Primary 색상으로 채움 */
+            border-radius: var(--rounded-full); /* 완벽한 원형 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: var(--canvas); /* 아이콘을 흰색으로 변경 */
+            border: none; /* 플랫 디자인을 위해 테두리 제거 */
+            cursor: pointer;
+        }
+
+        .action-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted); /* 은은한 서브 텍스트 */
+        }
+
+        /* 하단 네비게이션 바 (GNB) - 홈탭과 동일 */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            background-color: var(--canvas);
+            border-top: 1px solid var(--hairline);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 12px;
+            box-sizing: border-box;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 50px;
+        }
+
+        /* 현재 활성화된 탭 (복습) */
+        .nav-item.current-tab {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 22px;
+        }
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* 홈 버튼 플로팅 둥근 처리 */
+        .nav-item.active-home {
+            position: relative;
+            top: -16px;
+        }
+        .nav-item.active-home .icon-wrapper {
+            width: 56px;
+            height: 56px;
+            background-color: var(--primary);
+            border-radius: var(--rounded-full);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--canvas);
+            border: 4px solid var(--canvas);
+            box-shadow: 0 4px 12px rgba(131, 83, 157, 0.3); /* GNB 컴포넌트 일관성 */
+        }
+        .nav-item.active-home span {
+            color: var(--text-main);
+            font-weight: 700;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- 상태바 (홈탭과 동일) -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- 상단 헤더 (홈탭과 동일) -->
+        <header class="header">
+            <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
+            <h1>짬짬이</h1>
+            <div class="profile-btn"><i class="fa-regular fa-user"></i></div>
+        </header>
+
+        <!-- 세로 릴스 스크롤 영역 -->
+        <div class="reels-container">
+            
+            <!-- 피드 1번 (첫 번째 카드) -->
+            <div class="reel-item">
+                <div class="reel-header">
+                    <!-- 알약 형태 배지 및 24시간 표기 로직 적용 -->
+                    <span class="subject-badge">Philosophy 101</span>
+                    <span class="date-text">7/9 &middot; 12시간 전</span>
+                </div>
+                
+                <div class="reel-content">
+                    <h2>Epistemology</h2>
+                    <p>인식론<br><br>The theory of knowledge, especially with regard to its methods, validity, and scope.</p>
+                </div>
+            </div>
+
+            <!-- 피드 2번 (아래로 스와이프 시 나타남) -->
+            <div class="reel-item">
+                <div class="reel-header">
+                    <span class="subject-badge">TOEIC</span>
+                    <span class="date-text">7/8 &middot; 23시간 전</span>
+                </div>
+                
+                <div class="reel-content">
+                    <h2>Compensate</h2>
+                    <p>보상하다, 배상하다<br><br>The company will compensate you for your travel expenses.</p>
+                </div>
+            </div>
+            
+            <!-- 피드 3번 (스크롤 테스트용) -->
+            <div class="reel-item">
+                <div class="reel-header">
+                    <!-- 24시간이 지난 경우 날짜만 표기하는 로직 가이드 -->
+                    <span class="subject-badge">JLPT</span>
+                    <span class="date-text">7/7</span>
+                </div>
+                
+                <div class="reel-content">
+                    <h2>約束 (Yakusoku)</h2>
+                    <p>약속<br><br>明日、友達と会う約束があります。<br>(내일 친구와 만날 약속이 있습니다.)</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 액션 버튼 모음 (고정 위치) -->
+        <div class="reel-actions">
+            <div class="action-btn-group">
+                <div class="action-btn btn-know"><i class="fa-solid fa-check"></i></div>
+                <span class="action-label">알아요</span>
+            </div>
+            <div class="action-btn-group">
+                <div class="action-btn"><i class="fa-solid fa-rotate-right"></i></div>
+                <span class="action-label">한번더</span>
+            </div>
+            <div class="action-btn-group">
+                <div class="action-btn"><i class="fa-solid fa-xmark"></i></div>
+                <span class="action-label">몰라요</span>
+            </div>
+        </div>
+
+        <!-- 하단 네비게이션 바 (GNB) -->
+        <nav class="bottom-nav">
+            <div class="nav-item">
+                <i class="fa-solid fa-camera"></i>
+                <span>스캔</span>
+            </div>
+            <!-- 복습 탭 활성화 상태 -->
+            <div class="nav-item current-tab">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>복습</span>
+            </div>
+            <!-- 홈 탭 -->
+            <div class="nav-item active-home">
+                <div class="icon-wrapper">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span>홈</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-bolt"></i>
+                <span>퀴즈</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-chart-simple"></i>
+                <span>분석</span>
+            </div>
+        </nav>
+    </div>
+</body>
+</html>

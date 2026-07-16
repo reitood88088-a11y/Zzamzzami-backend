@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>짬짬이 - AI Quiz 탭</title>
+    <!-- 폰트: Pretendard -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <!-- 아이콘: FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* 디자인 가이드라인 토큰 적용 */
+        :root {
+            --primary: #83539D; /* Royal Lilac */
+            --text-main: #1A1A1A; /* Off-Black */
+            --text-muted: #666666; /* Subtitle gray */
+            --canvas: #FFFFFF; /* Pure White */
+            --hairline: #E5E5E5; /* Border Gray */
+            --block-cream: #F7F4EE; /* Pastel Cream */
+            --block-lilac: #E5DEFA; /* Pastel Lilac */
+            
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --rounded-lg: 24px;
+            --rounded-pill: 50px;
+            --rounded-full: 9999px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #E5E5E5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Pretendard', sans-serif;
+            color: var(--text-main);
+        }
+
+        .mobile-container {
+            width: 390px;
+            height: 844px;
+            background-color: var(--canvas);
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 8px solid var(--text-main);
+        }
+
+        /* 상단 헤더 (홈탭 동일) */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background-color: var(--primary);
+            z-index: 30;
+        }
+        .header .menu-btn { font-size: 28px; color: var(--canvas); }
+        .header h1 { font-size: 22px; font-weight: 800; color: var(--canvas); margin: 0; letter-spacing: -1px; }
+        .header .profile-btn { width: 36px; height: 36px; border-radius: var(--rounded-full); border: 2px solid var(--canvas); color: var(--canvas); display: flex; justify-content: center; align-items: center; }
+
+        /* 퀴즈 메인 영역 */
+        .quiz-content {
+            flex: 1;
+            padding: var(--spacing-lg);
+            background-color: var(--block-cream); /* 편안한 크림 배경 */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 스토리형 진행 바 */
+        .progress-bar-story {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+        .segment {
+            flex: 1;
+            height: 4px;
+            background-color: #D9D9D9;
+            border-radius: var(--rounded-pill);
+        }
+        .segment.active { background-color: var(--primary); }
+
+        /* 질문 영역 */
+        .question-text {
+            font-size: 26px; /* {type.headline} */
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -0.3px;
+            margin: 0;
+            margin-top: 10px;
+        }
+
+        /* 옵션 버튼 (Pill) */
+        .option-btn {
+            width: 100%;
+            padding: 18px 20px;
+            background-color: var(--canvas);
+            border: 1px solid var(--hairline);
+            border-radius: var(--rounded-pill);
+            font-size: 18px; /* {type.body} */
+            text-align: left;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+
+        /* Insight 섹션 */
+        .insight-card {
+            background-color: var(--block-lilac);
+            padding: var(--spacing-lg);
+            border-radius: var(--rounded-lg);
+            margin-top: 10px;
+        }
+        .insight-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .insight-card p {
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        /* 하단 네비게이션 (홈탭 동일) */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            background-color: var(--canvas);
+            border-top: 1px solid var(--hairline);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 12px;
+            box-sizing: border-box;
+            z-index: 20;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); width: 50px; }
+        .nav-item i { font-size: 22px; }
+        .nav-item span { font-size: 11px; }
+        .nav-item.current-tab { color: var(--primary); }
+        .nav-item.active-home { position: relative; top: -16px; }
+        .nav-item.active-home .icon-wrapper { width: 56px; height: 56px; background-color: var(--primary); border-radius: var(--rounded-full); display: flex; justify-content: center; align-items: center; color: var(--canvas); border: 4px solid var(--canvas); box-shadow: 0 4px 12px rgba(131, 83, 157, 0.3); }
+        .nav-item.active-home span { color: var(--text-main); font-weight: 700; margin-top: 2px; }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- 상단 헤더 -->
+        <header class="header">
+            <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
+            <h1>짬짬이</h1>
+            <div class="profile-btn"><i class="fa-regular fa-user"></i></div>
+        </header>
+
+        <!-- 퀴즈 콘텐츠 -->
+        <div class="quiz-content">
+            <!-- 스토리형 프로그레스 바 -->
+            <div class="progress-bar-story">
+                <div class="segment active"></div>
+                <div class="segment"></div>
+                <div class="segment"></div>
+                <div class="segment"></div>
+                <div class="segment"></div>
+            </div>
+
+            <h2 class="question-text">Which organelle is responsible for energy production?</h2>
+
+            <div class="options">
+                <button class="option-btn">Nucleus</button>
+                <button class="option-btn">Mitochondria</button>
+                <button class="option-btn">Ribosome</button>
+                <button class="option-btn">Golgi Apparatus</button>
+            </div>
+
+            <!-- Insight 카드 -->
+            <div class="insight-card">
+                <h3><i class="fa-solid fa-lightbulb"></i> Insight</h3>
+                <p>Mitochondria are often referred to as the powerhouse of the cell because they generate most of the cell's supply of adenosine triphosphate (ATP).</p>
+            </div>
+        </div>
+
+        <!-- 하단 GNB -->
+        <nav class="bottom-nav">
+            <div class="nav-item"> <i class="fa-solid fa-camera"></i> <span>스캔</span> </div>
+            <div class="nav-item"> <i class="fa-solid fa-layer-group"></i> <span>복습</span> </div>
+            <div class="nav-item active-home">
+                <div class="icon-wrapper"><i class="fa-solid fa-house"></i></div>
+                <span>홈</span>
+            </div>
+            <div class="nav-item current-tab"> <i class="fa-solid fa-bolt"></i> <span>퀴즈</span> </div>
+            <div class="nav-item"> <i class="fa-solid fa-chart-simple"></i> <span>분석</span> </div>
+        </nav>
+    </div>
+</body>
+</html>

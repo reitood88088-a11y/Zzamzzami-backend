@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>짬짬이 - 스캔 탭</title>
+    <!-- 폰트: Pretendard -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <!-- 아이콘: FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* 디자인 가이드라인 토큰 엄격 적용 */
+        :root {
+            /* Colors */
+            --primary: #83539D; /* Royal Lilac */
+            --text-main: #1A1A1A; /* Off-Black */
+            --text-muted: #666666; /* Subtitle gray */
+            --canvas: #FFFFFF; /* Pure White */
+            --surface-soft: #F2F2F2; /* Soft Gray */
+            --hairline: #E5E5E5; /* Border Gray */
+            --block-cream: #F7F4EE; /* Pastel Cream */
+            
+            /* Spacing */
+            --spacing-xs: 8px;
+            --spacing-sm: 12px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px; /* Color block interior padding */
+            
+            /* Radii (Shapes) */
+            --rounded-md: 8px;
+            --rounded-lg: 24px; /* Color-block sections */
+            --rounded-pill: 50px; /* Text buttons */
+            --rounded-full: 9999px; /* Icon buttons */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #E5E5E5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Pretendard', sans-serif;
+            color: var(--text-main);
+        }
+
+        .mobile-container {
+            width: 390px;
+            height: 844px;
+            background-color: var(--canvas);
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 8px solid var(--text-main);
+        }
+
+        .status-bar {
+            width: 100%;
+            height: 47px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 28px;
+            box-sizing: border-box;
+            font-size: 15px;
+            font-weight: 600;
+            background-color: var(--primary);
+            color: var(--canvas);
+            z-index: 30;
+        }
+        .status-bar .icons { display: flex; gap: 6px; font-size: 14px; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background-color: var(--primary);
+            z-index: 30;
+        }
+        .header .menu-btn {
+            font-size: 28px;
+            color: var(--canvas);
+            cursor: pointer;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--canvas);
+            margin: 0;
+            letter-spacing: -1px;
+        }
+        .header .profile-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--rounded-full);
+            border: 2px solid var(--canvas);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            color: var(--canvas);
+            background-color: transparent;
+            cursor: pointer;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .camera-viewport {
+            flex: 1;
+            position: relative;
+            /* 임시 배경: 교재 텍스트 이미지 */
+            background-image: url('https://images.unsplash.com/photo-1544716278-e513176f20b5?q=80&w=1000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 화면을 살짝 어둡게 눌러주는 오버레이 */
+        .camera-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        /* 스캔 프레임 (투명하게 뚫린 효과를 위해 outline 활용) */
+        .scan-focus-frame {
+            width: 75%;
+            height: 60%;
+            border-radius: var(--rounded-md);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            z-index: 10;
+            /* 프레임 내부는 원래 밝기로 보이게 */
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 스캔 애니메이션 선 */
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+            animation: scan-anim 2s infinite linear;
+        }
+
+        @keyframes scan-anim {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .floating-tools {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 20;
+        }
+        
+        .tool-btn {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.9); /* Surface Soft 느낌의 반투명 화이트 */
+            border-radius: var(--rounded-full);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            color: var(--text-main);
+            cursor: pointer;
+            border: none;
+            /* Flat Design: No shadow */
+        }
+
+        .bottom-action-sheet {
+            background-color: var(--block-cream);
+            border-radius: var(--rounded-lg) var(--rounded-lg) 0 0;
+            /* 48px interior padding, 하단 100px은 네비게이션 바 공간 확보 */
+            padding: var(--spacing-xxl) var(--spacing-lg) 100px var(--spacing-lg);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            margin-top: -32px; /* 카메라 뷰 위로 둥글게 겹쳐지도록 */
+        }
+
+        /* Typography Token: {type.headline} */
+        .bottom-action-sheet h2 {
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -0.3px;
+            color: var(--text-main);
+            margin: 0 0 12px 0;
+        }
+
+        /* Typography Token: {type.body} */
+        .bottom-action-sheet p {
+            font-size: 18px;
+            font-weight: 300;
+            line-height: 1.45;
+            letter-spacing: -0.2px;
+            color: var(--text-main);
+            margin: 0 0 32px 0;
+        }
+
+        /* Typography Token: {type.button} & Shape: Pill (50px) */
+        .scan-cta-btn {
+            width: 100%;
+            padding: 16px 20px;
+            background-color: var(--primary);
+            color: var(--canvas);
+            border: none;
+            border-radius: var(--rounded-pill);
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.1px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-family: 'Pretendard', sans-serif;
+            /* Flat Design: 그림자 제거 */
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            background-color: var(--canvas);
+            border-top: 1px solid var(--hairline);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 12px;
+            box-sizing: border-box;
+            z-index: 20;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 50px;
+        }
+        
+        /* 현재 위치한 탭(스캔) 활성화 색상 */
+        .nav-item.current-tab {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 22px;
+        }
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* 플로팅 홈 버튼 */
+        .nav-item.active-home {
+            position: relative;
+            top: -16px;
+        }
+        .nav-item.active-home .icon-wrapper {
+            width: 56px;
+            height: 56px;
+            background-color: var(--primary);
+            border-radius: var(--rounded-full);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--canvas);
+            border: 4px solid var(--canvas);
+            /* 홈 플로팅 버튼에만 예외적으로 뎁스 부여 (홈탭 가이드라인 유지) */
+            box-shadow: 0 4px 12px rgba(131, 83, 157, 0.3);
+        }
+        .nav-item.active-home span {
+            color: var(--text-main);
+            font-weight: 700;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <header class="header">
+            <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
+            <h1>짬짬이</h1>
+            <div class="profile-btn"><i class="fa-regular fa-user"></i></div>
+        </header>
+
+        <div class="main-content">
+            <div class="camera-viewport">
+                <!-- 전체 배경을 살짝 어둡게 -->
+                <div class="camera-overlay"></div>
+                
+                <!-- 스캔 초점 프레임 (이 부분만 밝게 보임) -->
+                <div class="scan-focus-frame">
+                    <div class="scan-line"></div>
+                </div>
+
+                <!-- 우측 플로팅 툴 -->
+                <div class="floating-tools">
+                    <button class="tool-btn"><i class="fa-solid fa-bolt"></i></button>
+                    <button class="tool-btn"><i class="fa-regular fa-image"></i></button>
+                </div>
+            </div>
+
+            <div class="bottom-action-sheet">
+                <h2>학습할 교재 촬영</h2>
+                <p>프레임 안에 페이지를 맞춰주세요.<br>AI가 즉시 텍스트를 추출합니다.</p>
+                <button class="scan-cta-btn">
+                    <i class="fa-solid fa-expand"></i> 스캔하기
+                </button>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <!-- 현재 탭 강조 -->
+            <div class="nav-item current-tab">
+                <i class="fa-solid fa-camera"></i>
+                <span>스캔</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>복습</span>
+            </div>
+            <!-- 홈 플로팅 버튼 -->
+            <div class="nav-item active-home">
+                <div class="icon-wrapper">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span>홈</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-bolt"></i>
+                <span>퀴즈</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-chart-simple"></i>
+                <span>분석</span>
+            </div>
+        </nav>
+    </div>
+</body>
+</html>

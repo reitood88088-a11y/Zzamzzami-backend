@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>짬짬이 - 학습 자료 상세</title>
+    <!-- 폰트: Pretendard -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <!-- 아이콘: FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* 디자인 가이드라인 토큰 적용 */
+        :root {
+            --primary: #83539D; /* Royal Lilac */
+            --text-main: #1A1A1A; /* Off-Black */
+            --text-muted: #666666; /* Subtitle gray */
+            --canvas: #FFFFFF; /* Pure White */
+            --surface-soft: #F2F2F2; /* Soft Gray */
+            --hairline: #E5E5E5; /* Border Gray */
+            --block-cream: #F7F4EE; /* Pastel Cream */
+            
+            /* Spacing & Radii */
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            --rounded-md: 8px;
+            --rounded-lg: 24px;
+            --rounded-pill: 50px;
+            --rounded-full: 9999px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #E5E5E5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Pretendard', sans-serif;
+            color: var(--text-main);
+        }
+
+        /* 모바일 디바이스 컨테이너 */
+        .mobile-container {
+            width: 390px;
+            height: 844px;
+            /* 카드가 돋보이도록 배경을 약간 톤다운(Soft Gray) */
+            background-color: var(--surface-soft); 
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 8px solid var(--text-main);
+        }
+
+        /* 상태바 */
+        .status-bar {
+            width: 100%;
+            height: 47px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 28px;
+            box-sizing: border-box;
+            font-size: 15px;
+            font-weight: 600;
+            background-color: var(--primary);
+            color: var(--canvas);
+            z-index: 10;
+        }
+        .status-bar .icons { display: flex; gap: 6px; font-size: 14px; }
+
+        /* 상단 헤더 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background-color: var(--primary);
+            z-index: 30;
+        }
+        /* 상세 페이지이므로 햄버거 대신 뒤로가기 버튼 적용 */
+        .header .back-btn {
+            font-size: 24px;
+            color: var(--canvas);
+            cursor: pointer;
+            width: 36px; /* 우측 프로필과 밸런스 맞춤 */
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--canvas);
+            margin: 0;
+            letter-spacing: -1px;
+        }
+        .header .profile-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--rounded-full);
+            border: 2px solid var(--canvas);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            color: var(--canvas);
+            cursor: pointer;
+        }
+
+        /* 메인 콘텐츠 영역 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* 피드 스크롤을 위해 감춤 */
+            padding-bottom: 80px; /* GNB 공간 */
+            background-color: var(--block-cream); /* 편안한 크림 배경 */
+        }
+
+        /* 인스타 스토리형 날짜 선택기 */
+        .story-date-container {
+            display: flex;
+            gap: 14px;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            background-color: var(--canvas);
+            border-bottom: 1px solid var(--hairline);
+        }
+        .story-date-container::-webkit-scrollbar { display: none; }
+
+        .story-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            scroll-snap-align: start;
+        }
+
+        /* 스토리 링 디자인 */
+        .story-ring {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--rounded-full);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid var(--hairline); /* 기본 비활성 테두리 */
+            padding: 2px;
+        }
+        .story-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--rounded-full);
+            background-color: var(--surface-soft);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+
+        /* 활성화된 날짜 (현재 선택된 날짜) */
+        .story-item.active .story-ring {
+            border: 2px solid var(--primary); /* 브랜드 컬러 포인트 */
+        }
+        .story-item.active .story-circle {
+            background-color: var(--canvas);
+            color: var(--primary);
+            border: 1px solid var(--hairline);
+        }
+
+        /* 인스타 피드형 텍스트 영역 */
+        .feed-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: var(--spacing-md) 0;
+        }
+
+        .feed-scroll {
+            display: flex;
+            gap: 12px;
+            padding: 0 var(--spacing-lg);
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+        }
+        .feed-scroll::-webkit-scrollbar { display: none; }
+
+        /* 텍스트 카드 */
+        .feed-card {
+            flex: 0 0 88%; /* 화면을 꽉 채우지 않고 다음 카드가 살짝 보이게 */
+            height: 380px; /* 카드 높이 고정 */
+            background-color: var(--canvas);
+            border-radius: var(--rounded-lg);
+            border: 1px solid var(--hairline);
+            padding: var(--spacing-lg);
+            box-sizing: border-box;
+            scroll-snap-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 텍스트 타이포그래피 */
+        .feed-card h3 {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin: 0 0 16px 0;
+            letter-spacing: 0.5px;
+        }
+        .feed-card p {
+            font-size: 20px; /* 가독성을 위한 Body-lg */
+            font-weight: 400;
+            line-height: 1.6;
+            color: var(--text-main);
+            margin: 0;
+            flex: 1;
+            overflow-y: auto; /* 내용이 길면 카드 내에서 스크롤 */
+        }
+        /* 카드 내 스크롤바 숨김 */
+        .feed-card p::-webkit-scrollbar { display: none; }
+
+        /* 페이지네이션 인디케이터 (인스타 닷) */
+        .pagination-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: var(--spacing-lg);
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: var(--rounded-full);
+            background-color: #D9D9D9;
+        }
+        .dot.active {
+            background-color: var(--primary);
+        }
+
+        /* 하단 네비게이션 바 (홈탭과 동일) */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            background-color: var(--canvas);
+            border-top: 1px solid var(--hairline);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 12px;
+            box-sizing: border-box;
+            z-index: 20;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 50px;
+        }
+        .nav-item i {
+            font-size: 22px;
+        }
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .nav-item.active-home {
+            position: relative;
+            top: -16px;
+        }
+        .nav-item.active-home .icon-wrapper {
+            width: 56px;
+            height: 56px;
+            background-color: var(--primary);
+            border-radius: var(--rounded-full);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--canvas);
+            border: 4px solid var(--canvas);
+        }
+        .nav-item.active-home span {
+            color: var(--text-main);
+            font-weight: 700;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- 상태바 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- 상단 헤더 (뒤로가기 버튼 반영) -->
+        <header class="header">
+            <div class="back-btn"><i class="fa-solid fa-chevron-left"></i></div>
+            <h1>짬짬이</h1>
+            <div class="profile-btn"><i class="fa-regular fa-user"></i></div>
+        </header>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="main-content">
+            
+            <!-- 1. 스토리형 날짜 선택기 -->
+            <div class="story-date-container">
+                <!-- 활성화된 현재 날짜 -->
+                <div class="story-item active">
+                    <div class="story-ring">
+                        <div class="story-circle">6/15</div>
+                    </div>
+                </div>
+                <!-- 이전 날짜들 -->
+                <div class="story-item">
+                    <div class="story-ring">
+                        <div class="story-circle">6/14</div>
+                    </div>
+                </div>
+                <div class="story-item">
+                    <div class="story-ring">
+                        <div class="story-circle">6/13</div>
+                    </div>
+                </div>
+                <div class="story-item">
+                    <div class="story-ring">
+                        <div class="story-circle">6/12</div>
+                    </div>
+                </div>
+                <div class="story-item">
+                    <div class="story-ring">
+                        <div class="story-circle">6/11</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 인스타 피드형 텍스트 영역 -->
+            <div class="feed-container">
+                <div class="feed-scroll">
+                    <!-- 첫 번째 문단 카드 -->
+                    <div class="feed-card">
+                        <h3>Paragraph 1</h3>
+                        <p>
+                            Despite the economic downturn, the company managed to increase its market share by introducing innovative solutions tailored to the changing needs of consumers. <br><br>
+                            Our new marketing strategy, which heavily utilizes social media influencers, has proven to be incredibly effective in reaching a younger demographic.
+                        </p>
+                    </div>
+                    
+                    <!-- 두 번째 문단 카드 -->
+                    <div class="feed-card">
+                        <h3>Paragraph 2</h3>
+                        <p>
+                            In addition to these external strategies, the management team has implemented a series of internal restructuring initiatives aimed at reducing operational costs.<br><br>
+                            Employees are encouraged to participate in cross-departmental training programs to enhance their skill sets and adaptability.
+                        </p>
+                    </div>
+                    
+                    <!-- 세 번째 문단 카드 -->
+                    <div class="feed-card">
+                        <h3>Paragraph 3</h3>
+                        <p>
+                            Consequently, we have seen a significant improvement in overall efficiency and employee morale.<br><br>
+                            We are confident that these proactive measures will secure the company's position as an industry leader for years to come.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 3. 페이지네이션 닷 (인디케이터) -->
+                <div class="pagination-dots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- 하단 네비게이션 바 -->
+        <nav class="bottom-nav">
+            <div class="nav-item">
+                <i class="fa-solid fa-camera"></i>
+                <span>스캔</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>복습</span>
+            </div>
+            <div class="nav-item active-home">
+                <div class="icon-wrapper">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span>홈</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-bolt"></i>
+                <span>퀴즈</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-chart-simple"></i>
+                <span>분석</span>
+            </div>
+        </nav>
+    </div>
+</body>
+</html>
