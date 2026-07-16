@@ -4,7 +4,7 @@ import json
 
 def process_diary_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
     genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    model = genai.GenerativeModel('gemini-3.5-flash')
     
     prompt = """
     You are an AI assistant that extracts text from scanned diary/study images and generates educational content.
