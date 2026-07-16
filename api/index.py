@@ -25,6 +25,16 @@ app.include_router(words.router, prefix="/api/v1")
 app.include_router(quizzes.router, prefix="/api/v1")
 app.include_router(dashboard.router, prefix="/api/v1")
 
+from fastapi.responses import RedirectResponse
+
+@app.get("/")
+def root():
+    return RedirectResponse(url="/docs")
+
+@app.get("/api")
+def api_root():
+    return RedirectResponse(url="/docs")
+
 @app.get("/api/health")
 def health_check():
     return {"status": "ok", "message": "Zzamzzami FastAPI is running smoothly!"}
