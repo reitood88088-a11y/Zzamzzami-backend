@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from 'react';
+import { flushSync } from 'react-dom';
 import StudyCard, { StudyItem } from './StudyCard';
 import ReviewActionButtons from './ReviewActionButtons';
 import { getReviewWords, updateWordStatus } from '../../api/client';
@@ -11,11 +12,11 @@ export default function ReelsFeed() {
   const [currentQueue, setCurrentQueue] = useState<StudyItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
-  const isProcessingRef = useRef(false);
-
-  // 사이클 트래킹용 상태
   const [cycleCount, setCycleCount] = useState(1);
-  const [cycleEndIndex, setCycleEndIndex] = useState(-1);
+  
+  // 절대 꼬이지 않도록 레퍼런스로 관리
+  const isProcessingRef = useRef(false);
+  const nextQueueRef = useRef<StudyItem[]>([]);
 
   useEffect(() => {
     async function loadReviews() {
@@ -40,7 +41,6 @@ export default function ReelsFeed() {
         
         const mapped = Array.from(uniqueWords.values());
         setCurrentQueue(mapped);
-        setCycleEndIndex(mapped.length - 1);
       } catch (err) {
         console.error('Failed to load review words', err);
       } finally {
@@ -65,45 +65,54 @@ export default function ReelsFeed() {
     
     const currentWord = currentQueue[currentIndex];
     
-    // 비동기 통신 (화면 전환을 막지 않음)
-    // 원래의 단어 ID를 추출하기 위해 - 원본 ID 사용
+    // 비동기 통신 - 원본 ID 사용
     const originalWordId = currentWord.originalId;
     updateWordStatus(originalWordId, status).catch(console.error);
 
-    let newQueue = currentQueue;
-    // 한번더, 몰라요의 경우 큐의 맨 끝에 카드를 덧붙임 (고유 ID 할당)
+    // 한번더/몰라요 이면 다음 사이클 대기열(Ref)에 즉시 푸시
     if (status === 'AGAIN' || status === 'DONT_KNOW') {
-      const duplicatedWord = { 
+      nextQueueRef.current.push({ 
         ...currentWord, 
-        id: `${originalWordId}-${Date.now()}` 
-      };
-      newQueue = [...currentQueue, duplicatedWord];
-      setCurrentQueue(newQueue);
+        id: `${originalWordId}-${Date.now()}` // 고유 렌더링 키
+      });
     }
 
-    // 1. 모든 복습이 완료되었는지 체크
-    if (currentIndex >= newQueue.length - 1) {
-      showToastMessage("모든 복습을 완료했습니다! 🎉");
-      setTimeout(() => {
+    // 현재 사이클의 마지막 카드인지 체크
+    if (currentIndex >= currentQueue.length - 1) {
+      if (nextQueueRef.current.length === 0) {
+        showToastMessage("모든 복습을 완료했습니다! 🎉");
         setCurrentQueue([]);
         isProcessingRef.current = false;
-      }, 500);
-      return;
+        return;
+      } else {
+        const nextCycleNum = cycleCount + 1;
+        const nextCycleWords = [...nextQueueRef.current];
+        
+        // 다음 큐 비우기
+        nextQueueRef.current = [];
+        
+        // 화면을 강제로 즉시 업데이트 (flushSync)
+        flushSync(() => {
+          setCycleCount(nextCycleNum);
+          setCurrentQueue(nextCycleWords);
+          setCurrentIndex(0);
+        });
+
+        // 렌더링 직후 곧바로 맨 위로 스크롤 이동
+        containerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+        
+        // 지연 없이 즉각적으로 토스트 띄우기
+        showToastMessage(`${nextCycleNum}번째 복습 사이클이 시작되었습니다!`);
+        
+        // 아주 짧은 락 해제 타임
+        setTimeout(() => {
+          isProcessingRef.current = false;
+        }, 100);
+        return;
+      }
     }
 
-    // 2. 현재 사이클의 마지막 카드를 방금 처리했는지 체크
-    if (currentIndex === cycleEndIndex) {
-      const nextCycle = cycleCount + 1;
-      setCycleCount(nextCycle);
-      setCycleEndIndex(newQueue.length - 1); // 다음 사이클의 마지막 인덱스 업데이트
-      
-      // 스크롤이 도착하는 시점(400ms)에 맞추어 토스트 띄우기
-      setTimeout(() => {
-        showToastMessage(`${nextCycle}번째 복습 사이클이 시작되었습니다!`);
-      }, 400);
-    }
-
-    // 3. 다음 카드로 스크롤 이동
+    // 다음 카드로 스무스 스크롤 이동
     const nextIndex = currentIndex + 1;
     const cardHeight = containerRef.current.offsetHeight; 
     
@@ -114,9 +123,10 @@ export default function ReelsFeed() {
 
     setCurrentIndex(nextIndex);
     
+    // 스크롤 애니메이션 동안 클릭 방지
     setTimeout(() => {
       isProcessingRef.current = false;
-    }, 400); // 스크롤 애니메이션 동안 클릭 방지
+    }, 400); 
   };
 
   if (loading) {
