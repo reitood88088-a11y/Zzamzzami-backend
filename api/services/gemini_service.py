@@ -11,6 +11,8 @@ def process_diary_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> di
     1. Detect the primary language of the text based on the language that makes up the largest proportion/majority of the text. It must be strictly one of: "English", "Chinese", or "Japanese".
     2. Extract all readable text from the image.
     3. Identify 5-10 important or difficult words from the text and provide their Korean meanings and an example sentence.
+       - If the language is Chinese, append the pinyin in parentheses to the word (e.g., "汉字 (hàn zì)").
+       - If the language is Japanese, append the hiragana reading in parentheses to the word (e.g., "漢字 (かんじ)").
     4. Generate 3 multiple-choice questions based on the content of the text to test reading comprehension. Each question must have exactly 4 options.
     
     Return the response ONLY as a raw JSON object (without Markdown code blocks like ```json) that exactly matches this format:

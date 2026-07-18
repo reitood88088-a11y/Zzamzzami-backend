@@ -15,6 +15,17 @@ interface StudyCardProps {
 }
 
 export default function StudyCard({ item }: StudyCardProps) {
+  // 발음 기호(한어병음, 히라가나 등)가 괄호로 끝에 포함되어 있는지 파싱
+  // 예: "汉字 (hàn zì)" -> mainWord: "汉字", reading: "hàn zì"
+  let mainWord = item.word;
+  let reading = "";
+  
+  const match = item.word.match(/^(.*?)\s*\((.*?)\)$/);
+  if (match) {
+    mainWord = match[1].trim();
+    reading = match[2].trim();
+  }
+
   return (
     <div className="w-[calc(100%-48px)] h-[calc(100%-40px)] mx-auto bg-white border border-[#E5E5E5] rounded-[24px] shadow-none flex flex-col relative snap-center flex-shrink-0 overflow-hidden">
       
@@ -33,10 +44,17 @@ export default function StudyCard({ item }: StudyCardProps) {
 
         {/* 메인 학습 컨텐츠 */}
         <div className="flex flex-col gap-4 mt-auto mb-auto">
-          <h2 className="text-primary text-[26px] font-bold leading-[1.35] tracking-[-0.3px]">
-            {item.word}
-          </h2>
           <div className="flex flex-col gap-1">
+            <h2 className="text-primary text-[28px] font-bold leading-[1.25] tracking-[-0.3px]">
+              {mainWord}
+            </h2>
+            {reading && (
+              <span className="text-[#888888] text-[18px] font-medium leading-[1.2]">
+                {reading}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-col gap-2 mt-2">
             <p className="text-[#1A1A1A] text-[18px] font-normal leading-[1.45] tracking-[-0.2px]">
               {item.meaning}
             </p>
