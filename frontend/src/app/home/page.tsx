@@ -17,9 +17,17 @@ export default async function HomePage() {
         const dObj = new Date(d.date);
         const mm = String(dObj.getMonth() + 1).padStart(2, '0');
         const dd = String(dObj.getDate()).padStart(2, '0');
+        
+        // 24시간 이내인지 확인하여 isNew 동적 계산
+        const createdAt = d.createdAt ? new Date(d.createdAt) : dObj;
+        const now = new Date();
+        const diffMs = now.getTime() - createdAt.getTime();
+        const isNew = diffMs < 24 * 60 * 60 * 1000;
+        
         return {
           ...d,
           date: `${mm}.${dd}`,
+          isNew, // 24시간 지났으면 false로 덮어쓰기
         };
       });
     }
