@@ -18,7 +18,7 @@ export default function SplashScreen() {
   }, [router]);
 
   return (
-    <main className="w-full h-full bg-primary flex flex-col items-center justify-center">
+    <main className="w-full h-[100dvh] bg-primary flex flex-col items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
