@@ -10,7 +10,7 @@ export default function AnalysisPage() {
       <GlobalHeader />
 
       {/* 2. 중앙 분석 클라이언트 영역 (헤더 높이만큼 마진, 남은 공간 차지, 내부 스크롤) */}
-      <div className="flex-1 flex flex-col mt-[115px] mb-[80px] overflow-hidden">
+      <div className="flex-1 flex flex-col mt-[60px] mb-[80px] overflow-hidden">
         <AnalysisClient />
       </div>
 

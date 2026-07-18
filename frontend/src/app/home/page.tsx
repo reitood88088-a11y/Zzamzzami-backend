@@ -40,8 +40,8 @@ export default async function HomePage() {
       {/* 상단 고정 헤더 */}
       <GlobalHeader />
 
-      {/* 메인 스크롤 영역 (헤더 115px, 하단 네비 80px 제외) */}
-      <main className="flex-1 overflow-y-auto mt-[115px] mb-[80px] no-scrollbar">
+      {/* 메인 스크롤 영역 (헤더 60px, 하단 네비 80px 제외) */}
+      <main className="flex-1 overflow-y-auto mt-[60px] mb-[80px] no-scrollbar">
         {subjects.map((subject, index) => {
           const subjectDiaries = diaries.filter((d: any) => d.subject === subject);
           // 짝수 인덱스(0부터 시작하므로 1번 인덱스인 Chinese가 isEven)

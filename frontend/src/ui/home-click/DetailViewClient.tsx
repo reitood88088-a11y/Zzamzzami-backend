@@ -91,14 +91,14 @@ export default function DetailViewClient({ subject, diaries, initialDate }: Deta
 
   if (diaries.length === 0) {
     return (
-      <div className="w-full h-full bg-[#F7F4EE] flex flex-col pt-[115px] pb-[80px] items-center justify-center">
+      <div className="w-full h-full bg-[#F7F4EE] flex flex-col pt-[60px] pb-[80px] items-center justify-center">
         <p className="text-[#999]">스캔된 데이터가 없습니다.</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full bg-[#F7F4EE] flex flex-col pt-[115px] pb-[80px]">
+    <div className="w-full h-full bg-[#F7F4EE] flex flex-col pt-[60px] pb-[80px]">
       
       {/* 1. 스토리 링 영역 (고유 날짜 목록) */}
       <div 

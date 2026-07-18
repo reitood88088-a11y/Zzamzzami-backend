@@ -11,7 +11,7 @@ export default function ScanPage() {
       <GlobalHeader />
 
       {/* 2. 중앙 카메라 뷰포트 (헤더 높이만큼 마진, Flex-grow로 남은 공간 모두 차지) */}
-      <div className="flex-1 flex flex-col mt-[115px] mb-[80px]">
+      <div className="flex-1 flex flex-col mt-[60px] mb-[80px]">
         <CameraViewport />
 
         {/* 3. 하단 액션 시트 (카메라 화면을 살짝 덮어쓰도록 설계됨) */}

@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { ChevronLeft, User, Signal, Wifi, Battery } from 'lucide-react';
+import { ChevronLeft, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function DetailHeader() {
@@ -9,15 +9,6 @@ export default function DetailHeader() {
 
   return (
     <div className="fixed top-0 left-0 w-full sm:absolute sm:top-0 sm:left-0 z-50 bg-primary flex flex-col shadow-none border-none">
-      {/* 상태 표시줄 (Status Bar) */}
-      <div className="flex justify-between items-center h-[47px] px-[28px]">
-        <span className="text-white text-[15px] font-semibold leading-normal">9:41</span>
-        <div className="flex items-center gap-[6px] text-white">
-          <Signal size={14} className="fill-white" />
-          <Wifi size={14} />
-          <Battery size={14} />
-        </div>
-      </div>
 
       {/* 글로벌 헤더 (Header) */}
       <header className="flex justify-between items-center py-[16px] px-[24px]">
