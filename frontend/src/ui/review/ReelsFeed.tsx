@@ -9,24 +9,37 @@ export default function ReelsFeed() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentQueue, setCurrentQueue] = useState<StudyItem[]>([]);
-  const [nextQueue, setNextQueue] = useState<StudyItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const isProcessingRef = useRef(false);
+
+  // 사이클 트래킹용 상태
+  const [cycleCount, setCycleCount] = useState(1);
+  const [cycleEndIndex, setCycleEndIndex] = useState(-1);
 
   useEffect(() => {
     async function loadReviews() {
       try {
         const res = await getReviewWords('English'); // Hardcode subject for now
-        const mapped: StudyItem[] = res.data.map((w: any) => ({
-          id: w.wordId,
-          language: 'English',
-          timestamp: 'Just now',
-          word: w.word,
-          meaning: w.meaning,
-          example: w.exampleSentence || ''
-        }));
+        
+        // 중복 방지를 위한 Map (단어 뜻 동일하면 하나만)
+        const uniqueWords = new Map<string, StudyItem>();
+        res.data.forEach((w: any) => {
+          if (!uniqueWords.has(w.word.toLowerCase())) {
+            uniqueWords.set(w.word.toLowerCase(), {
+              id: w.wordId,
+              language: 'English',
+              timestamp: 'Just now',
+              word: w.word,
+              meaning: w.meaning,
+              example: w.exampleSentence || ''
+            });
+          }
+        });
+        
+        const mapped = Array.from(uniqueWords.values());
         setCurrentQueue(mapped);
+        setCycleEndIndex(mapped.length - 1);
       } catch (err) {
         console.error('Failed to load review words', err);
       } finally {
@@ -40,7 +53,7 @@ export default function ReelsFeed() {
     setToastMsg(msg);
     setTimeout(() => {
       setToastMsg(null);
-    }, 2000);
+    }, 2500);
   };
 
   const handleActionClick = (status: 'KNOW' | 'AGAIN' | 'DONT_KNOW') => {
@@ -52,41 +65,43 @@ export default function ReelsFeed() {
     const currentWord = currentQueue[currentIndex];
     
     // 비동기 통신 (화면 전환을 막지 않음)
-    updateWordStatus(currentWord.id, status).catch(console.error);
+    // 원래의 단어 ID를 추출하기 위해 - 덧붙여진 고유 키에서 앞부분만 사용
+    const originalWordId = currentWord.id.split('-')[0];
+    updateWordStatus(originalWordId, status).catch(console.error);
 
-    let updatedNextQueue = nextQueue;
-    // 한번더, 몰라요의 경우 다음 큐에 추가
+    let newQueue = currentQueue;
+    // 한번더, 몰라요의 경우 큐의 맨 끝에 카드를 덧붙임 (고유 ID 할당)
     if (status === 'AGAIN' || status === 'DONT_KNOW') {
-      updatedNextQueue = [...nextQueue, currentWord];
-      setNextQueue(updatedNextQueue);
+      const duplicatedWord = { 
+        ...currentWord, 
+        id: `${originalWordId}-${Date.now()}` 
+      };
+      newQueue = [...currentQueue, duplicatedWord];
+      setCurrentQueue(newQueue);
     }
 
-    // 마지막 카드 처리
-    if (currentIndex >= currentQueue.length - 1) {
-      if (updatedNextQueue.length === 0) {
-        showToastMessage("모든 복습을 완료했습니다!");
-        setCurrentQueue([]); // 모두 완료됨
+    // 1. 모든 복습이 완료되었는지 체크
+    if (currentIndex >= newQueue.length - 1) {
+      showToastMessage("모든 복습을 완료했습니다! 🎉");
+      setTimeout(() => {
+        setCurrentQueue([]);
         isProcessingRef.current = false;
-        return;
-      } else {
-        showToastMessage("다음 복습 사이클을 시작합니다!");
-        setCurrentQueue(updatedNextQueue);
-        setNextQueue([]);
-        setCurrentIndex(0);
-        // 즉시 맨 위로 스크롤 리셋
-        containerRef.current.scrollTo({ top: 0, behavior: 'instant' });
-        setTimeout(() => {
-          isProcessingRef.current = false;
-        }, 100);
-        return;
-      }
+      }, 500);
+      return;
     }
 
-    // 다음 카드로 이동
+    // 2. 현재 사이클의 마지막 카드를 방금 처리했는지 체크
+    if (currentIndex === cycleEndIndex) {
+      const nextCycle = cycleCount + 1;
+      setCycleCount(nextCycle);
+      setCycleEndIndex(newQueue.length - 1); // 다음 사이클의 마지막 인덱스 업데이트
+      showToastMessage(`${nextCycle}번째 복습 사이클을 시작합니다!`);
+    }
+
+    // 3. 다음 카드로 스크롤 이동
     const nextIndex = currentIndex + 1;
     const cardHeight = containerRef.current.offsetHeight; 
     
-    // 스무스 스크롤 이동
     containerRef.current.scrollTo({
       top: cardHeight * nextIndex,
       behavior: 'smooth'
@@ -130,13 +145,12 @@ export default function ReelsFeed() {
       )}
 
       {/* 세로 스크롤을 막고(overflow-hidden), 스냅 속성을 유지하는 컨테이너 */}
-      {/* 사용자는 수동으로 스크롤할 수 없고 반드시 하단 버튼을 클릭해야 넘어감 */}
       <div 
         ref={containerRef}
         className="w-full h-full overflow-hidden snap-y snap-mandatory pb-[40px] pt-[20px]"
       >
-        {currentQueue.map((item, idx) => (
-          <div key={item.id + '-' + idx} className="w-full h-full snap-center flex flex-col justify-center shrink-0">
+        {currentQueue.map((item) => (
+          <div key={item.id} className="w-full h-full snap-center flex flex-col justify-center shrink-0">
             <StudyCard item={item} />
           </div>
         ))}
