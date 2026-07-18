@@ -60,7 +60,7 @@ model Word {
   exampleSentence     String?            @db.Text @map("example_sentence")
   createdAt           DateTime           @default(now()) @map("created_at")
 
-  diary               Diary              @relation(fields: [diaryId], references: [id])
+  diary               Diary              @relation(fields: [diaryId], references: [id], onDelete: Cascade)
   userStatuses        UserWordStatus[]
 
   @@map("word")
@@ -73,8 +73,8 @@ model UserWordStatus {
   status              WordStatus
   updatedAt           DateTime           @updatedAt @map("updated_at")
 
-  user                User               @relation(fields: [userId], references: [id])
-  word                Word               @relation(fields: [wordId], references: [id])
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word                Word               @relation(fields: [wordId], references: [id], onDelete: Cascade)
 
   @@unique([userId, wordId])
   @@map("user_word_status")
@@ -89,7 +89,7 @@ model Quiz {
   explanation         String             @db.Text
   createdAt           DateTime           @default(now()) @map("created_at")
 
-  diary               Diary              @relation(fields: [diaryId], references: [id])
+  diary               Diary              @relation(fields: [diaryId], references: [id], onDelete: Cascade)
   attempts            QuizAttempt[]
 
   @@map("quiz")
@@ -102,8 +102,8 @@ model QuizAttempt {
   isCorrect           Boolean            @map("is_correct")
   createdAt           DateTime           @default(now()) @map("created_at")
 
-  user                User               @relation(fields: [userId], references: [id])
-  quiz                Quiz               @relation(fields: [quizId], references: [id])
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz                Quiz               @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   @@map("quiz_attempt")
 }
