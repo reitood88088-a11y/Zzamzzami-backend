@@ -142,7 +142,7 @@ export default function DetailViewClient({ subject, diaries, initialDate }: Deta
         {activeDiaries.map((diary) => (
           <div 
             key={`feed-${diary.id}`}
-            className="flex-shrink-0 w-[88%] h-[380px] bg-white border border-[#E5E5E5] rounded-[24px] p-[24px] snap-center overflow-y-auto no-scrollbar shadow-none relative"
+            className="flex-shrink-0 w-[88%] h-full bg-white border border-[#E5E5E5] rounded-[24px] p-[24px] snap-center overflow-y-auto no-scrollbar shadow-none relative"
           >
             <div className="flex justify-between items-start mb-4">
               <h2 className="text-primary text-[14px] font-bold tracking-[0.5px] uppercase mt-1">
