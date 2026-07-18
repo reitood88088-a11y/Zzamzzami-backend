@@ -75,6 +75,13 @@ export async function getDashboard() {
   return fetchApi(`/dashboard`);
 }
 
+export async function reportStudyTime(subject: string, seconds: number) {
+  return fetchApi(`/dashboard/time`, {
+    method: 'POST',
+    body: JSON.stringify({ subject, seconds }),
+  });
+}
+
 // 7. 명언 (Quotes)
 export async function getQuotes() {
   return fetchApi(`/quotes`);

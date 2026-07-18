@@ -5,6 +5,7 @@ import { Lightbulb, ArrowRight } from 'lucide-react';
 import StoryProgressBar from './StoryProgressBar';
 import clsx from 'clsx';
 import { getQuizzes, submitQuizAttempt } from '../../api/client';
+import { useStudyTimeTracker } from '../../hooks/useStudyTimeTracker';
 
 export default function QuizClient() {
   const [quizzes, setQuizzes] = useState<any[]>([]);
@@ -12,6 +13,9 @@ export default function QuizClient() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isShowingInsight, setIsShowingInsight] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+
+  // Hardcode language for now, just like getQuizzes('English')
+  useStudyTimeTracker('English');
 
   useEffect(() => {
     async function loadQuizzes() {

@@ -50,17 +50,9 @@ export default function AnalysisClient() {
     streakDays: dashboardData.consecutiveDays || 0,
   };
 
-  // Keep mock charts and time insight since backend doesn't support them yet
-  const chartData = [
-    { day: 'mon.', value: 20 },
-    { day: 'tue.', value: 45 },
-    { day: 'wed.', value: 10 },
-    { day: 'thu.', value: 60 },
-    { day: 'fri.', value: 35 },
-    { day: 'sat.', value: 0 },
-    { day: 'sun.', value: 50 },
-  ];
-  const hoursSaved = 5.5;
+  // Use real data from API for charts based on selected tab
+  const chartData = dashboardData.weeklyChart ? dashboardData.weeklyChart[selectedTab] || [] : [];
+  const hoursSaved = dashboardData.hoursSaved || 0;
 
   return (
     <div className="w-full h-full flex flex-col px-[20px] pt-[20px] pb-[40px] bg-[#F7F4EE] overflow-y-auto no-scrollbar gap-[16px]">

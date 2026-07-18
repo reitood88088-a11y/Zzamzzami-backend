@@ -5,6 +5,7 @@ import { flushSync } from 'react-dom';
 import StudyCard, { StudyItem } from './StudyCard';
 import ReviewActionButtons from './ReviewActionButtons';
 import { getReviewWords, updateWordStatus } from '../../api/client';
+import { useStudyTimeTracker } from '../../hooks/useStudyTimeTracker';
 
 export default function ReelsFeed() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -17,6 +18,10 @@ export default function ReelsFeed() {
   // 절대 꼬이지 않도록 레퍼런스로 관리
   const isProcessingRef = useRef(false);
   const nextQueueRef = useRef<StudyItem[]>([]);
+
+  // 현재 보고 있는 카드의 언어를 트래킹
+  const currentLanguage = currentQueue.length > 0 ? (currentQueue[currentIndex]?.language as 'English' | 'Chinese' | 'Japanese') : null;
+  useStudyTimeTracker(currentLanguage);
 
   useEffect(() => {
     async function loadReviews() {

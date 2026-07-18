@@ -31,6 +31,7 @@ model User {
   wordStatuses        UserWordStatus[]
   quizAttempts        QuizAttempt[]
   quotes              UserQuote[]
+  dailyStudyTimes     DailyStudyTime[]
 
   @@map("user")
 }
@@ -117,4 +118,19 @@ model UserQuote {
   user                User               @relation(fields: [userId], references: [id])
 
   @@map("user_quote")
+}
+
+model DailyStudyTime {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  subject         Subject
+  date            DateTime @db.Date
+  durationSeconds Int      @default(0) @map("duration_seconds")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subject, date])
+  @@map("daily_study_time")
 }
