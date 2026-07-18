@@ -12,6 +12,7 @@ export default function ReelsFeed() {
   const [nextQueue, setNextQueue] = useState<StudyItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const isProcessingRef = useRef(false);
 
   useEffect(() => {
     async function loadReviews() {
@@ -44,6 +45,9 @@ export default function ReelsFeed() {
 
   const handleActionClick = (status: 'KNOW' | 'AGAIN' | 'DONT_KNOW') => {
     if (!containerRef.current || currentQueue.length === 0) return;
+    if (isProcessingRef.current) return;
+    
+    isProcessingRef.current = true;
     
     const currentWord = currentQueue[currentIndex];
     
@@ -62,6 +66,7 @@ export default function ReelsFeed() {
       if (updatedNextQueue.length === 0) {
         showToastMessage("모든 복습을 완료했습니다!");
         setCurrentQueue([]); // 모두 완료됨
+        isProcessingRef.current = false;
         return;
       } else {
         showToastMessage("다음 복습 사이클을 시작합니다!");
@@ -70,6 +75,9 @@ export default function ReelsFeed() {
         setCurrentIndex(0);
         // 즉시 맨 위로 스크롤 리셋
         containerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+        setTimeout(() => {
+          isProcessingRef.current = false;
+        }, 100);
         return;
       }
     }
@@ -85,6 +93,10 @@ export default function ReelsFeed() {
     });
 
     setCurrentIndex(nextIndex);
+    
+    setTimeout(() => {
+      isProcessingRef.current = false;
+    }, 400); // 스크롤 애니메이션 동안 클릭 방지
   };
 
   if (loading) {
