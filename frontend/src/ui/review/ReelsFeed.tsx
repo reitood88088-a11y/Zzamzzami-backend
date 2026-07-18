@@ -96,13 +96,14 @@ export default function ReelsFeed() {
           setCycleCount(nextCycleNum);
           setCurrentQueue(nextCycleWords);
           setCurrentIndex(0);
+          setToastMsg(`${nextCycleNum}번째 복습 사이클이 시작되었습니다!`);
         });
 
         // 렌더링 직후 곧바로 맨 위로 스크롤 이동
         containerRef.current.scrollTo({ top: 0, behavior: 'instant' });
         
-        // 지연 없이 즉각적으로 토스트 띄우기
-        showToastMessage(`${nextCycleNum}번째 복습 사이클이 시작되었습니다!`);
+        // 자동 닫힘 타이머
+        setTimeout(() => setToastMsg(null), 2500);
         
         // 아주 짧은 락 해제 타임
         setTimeout(() => {
@@ -159,13 +160,13 @@ export default function ReelsFeed() {
         </div>
       )}
 
-      {/* 세로 스크롤을 막고(overflow-hidden), 스냅 속성을 유지하는 컨테이너 */}
+      {/* 세로 스크롤을 막고(overflow-hidden), JS로만 스크롤 제어 */}
       <div 
         ref={containerRef}
-        className="w-full h-full overflow-hidden snap-y snap-mandatory pb-[40px] pt-[20px]"
+        className="w-full h-full overflow-hidden"
       >
         {currentQueue.map((item) => (
-          <div key={item.id} className="w-full h-full snap-center flex flex-col justify-center shrink-0">
+          <div key={item.id} className="w-full h-full flex flex-col justify-center shrink-0">
             <StudyCard item={item} />
           </div>
         ))}
