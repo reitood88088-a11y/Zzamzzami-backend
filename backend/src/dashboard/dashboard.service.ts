@@ -13,7 +13,12 @@ export class DashboardService {
     const correctAttempts = await this.prisma.quizAttempt.count({ where: { userId, isCorrect: true } });
     
     const quizAccuracy = totalAttempts > 0 ? (correctAttempts / totalAttempts) * 100 : 0;
-    const wordsLearned = await this.prisma.userWordStatus.count({ where: { userId } });
+    const wordsLearned = await this.prisma.userWordStatus.count({ 
+      where: { 
+        userId,
+        status: 'KNOW',
+      } 
+    });
 
     return {
       totalStudyMinutes: user.totalStudyMinutes,
