@@ -39,6 +39,12 @@ export async function getDiaries(subject?: string) {
   return fetchApi(`/diaries${query}`);
 }
 
+export async function deleteDiary(id: string) {
+  return fetchApi(`/diaries/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 // 3. 복습 단어
 export async function getReviewWords(subject: string) {
   return fetchApi(`/words/review?subject=${subject}`);

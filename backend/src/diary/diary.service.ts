@@ -53,4 +53,12 @@ export class DiaryService {
       orderBy: { date: 'desc' },
     });
   }
+
+  async deleteDiary(userId: string, diaryId: string) {
+    const diary = await this.prisma.diary.findUnique({ where: { id: diaryId } });
+    if (!diary || diary.userId !== userId) {
+      throw new Error('Diary not found or unauthorized');
+    }
+    return this.prisma.diary.delete({ where: { id: diaryId } });
+  }
 }

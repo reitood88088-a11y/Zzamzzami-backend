@@ -2,6 +2,9 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import clsx from 'clsx';
+import { useRouter } from 'next/navigation';
+import { Trash2 } from 'lucide-react';
+import { deleteDiary } from '../../api/client';
 
 interface DetailViewClientProps {
   subject: string;
@@ -19,6 +22,8 @@ export default function DetailViewClient({ subject, diaries, initialDate }: Deta
 
   const [activeDateIndex, setActiveDateIndex] = useState(startIndex);
   const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
 
   const activeDate = uniqueDates[activeDateIndex];
   
@@ -64,6 +69,23 @@ export default function DetailViewClient({ subject, diaries, initialDate }: Deta
     
     if (newIndex !== activeCardIndex && newIndex >= 0 && newIndex < activeDiaries.length) {
       setActiveCardIndex(newIndex);
+    }
+  };
+
+  const handleDeleteClick = async (diaryId: string) => {
+    if (confirm('이 다이어리를 정말 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.')) {
+      setIsDeleting(true);
+      try {
+        await deleteDiary(diaryId);
+        // 삭제 성공 시 홈 화면으로 이동하거나 라우터 새로고침
+        router.push('/home');
+        router.refresh();
+      } catch (error) {
+        console.error('Failed to delete diary:', error);
+        alert('삭제에 실패했습니다. 다시 시도해주세요.');
+      } finally {
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -120,11 +142,21 @@ export default function DetailViewClient({ subject, diaries, initialDate }: Deta
         {activeDiaries.map((diary) => (
           <div 
             key={`feed-${diary.id}`}
-            className="flex-shrink-0 w-[88%] h-[380px] bg-white border border-[#E5E5E5] rounded-[24px] p-[24px] snap-center overflow-y-auto no-scrollbar shadow-none"
+            className="flex-shrink-0 w-[88%] h-[380px] bg-white border border-[#E5E5E5] rounded-[24px] p-[24px] snap-center overflow-y-auto no-scrollbar shadow-none relative"
           >
-            <h2 className="text-primary text-[14px] font-bold tracking-[0.5px] uppercase mb-4">
-              {diary.subject}
-            </h2>
+            <div className="flex justify-between items-start mb-4">
+              <h2 className="text-primary text-[14px] font-bold tracking-[0.5px] uppercase mt-1">
+                {diary.subject}
+              </h2>
+              <button
+                onClick={() => handleDeleteClick(diary.id)}
+                disabled={isDeleting}
+                className="p-2 -mt-2 -mr-2 text-[#999999] hover:text-[#FF3B30] hover:bg-red-50 rounded-full transition-colors disabled:opacity-50"
+                title="삭제"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
             <p className="text-[#1A1A1A] text-[20px] font-normal leading-[1.6] whitespace-pre-wrap">
               {diary.fullText}
             </p>

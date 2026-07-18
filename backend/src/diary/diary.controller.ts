@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query, UploadedFile, UseInterceptors, Body } from '@nestjs/common';
+import { Controller, Get, Post, Query, UploadedFile, UseInterceptors, Body, Delete, Param } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DiaryService } from './diary.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -38,5 +38,14 @@ export class DiaryController {
 
     const diaries = await this.diaryService.getDiaries(user.id, subject);
     return { success: true, data: diaries };
+  }
+
+  @Delete(':id')
+  async deleteDiary(@Param('id') id: string) {
+    const user = await this.prisma.getDefaultUser();
+    if (!user) throw new Error('User not found');
+
+    await this.diaryService.deleteDiary(user.id, id);
+    return { success: true, message: 'Diary deleted successfully' };
   }
 }
