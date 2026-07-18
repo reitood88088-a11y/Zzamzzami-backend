@@ -2,6 +2,7 @@ import React from 'react';
 
 export interface StudyItem {
   id: string;
+  originalId: string;
   language: string;
   timestamp: string;
   word: string;

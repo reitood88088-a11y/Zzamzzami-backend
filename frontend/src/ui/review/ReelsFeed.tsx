@@ -25,9 +25,10 @@ export default function ReelsFeed() {
         // 중복 방지를 위한 Map (단어 뜻 동일하면 하나만)
         const uniqueWords = new Map<string, StudyItem>();
         res.data.forEach((w: any) => {
-          if (!uniqueWords.has(w.word.toLowerCase())) {
-            uniqueWords.set(w.word.toLowerCase(), {
+          if (!uniqueWords.has(w.word.toLowerCase().trim())) {
+            uniqueWords.set(w.word.toLowerCase().trim(), {
               id: w.wordId,
+              originalId: w.wordId,
               language: 'English',
               timestamp: 'Just now',
               word: w.word,
@@ -65,8 +66,8 @@ export default function ReelsFeed() {
     const currentWord = currentQueue[currentIndex];
     
     // 비동기 통신 (화면 전환을 막지 않음)
-    // 원래의 단어 ID를 추출하기 위해 - 덧붙여진 고유 키에서 앞부분만 사용
-    const originalWordId = currentWord.id.split('-')[0];
+    // 원래의 단어 ID를 추출하기 위해 - 원본 ID 사용
+    const originalWordId = currentWord.originalId;
     updateWordStatus(originalWordId, status).catch(console.error);
 
     let newQueue = currentQueue;
@@ -95,7 +96,11 @@ export default function ReelsFeed() {
       const nextCycle = cycleCount + 1;
       setCycleCount(nextCycle);
       setCycleEndIndex(newQueue.length - 1); // 다음 사이클의 마지막 인덱스 업데이트
-      showToastMessage(`${nextCycle}번째 복습 사이클을 시작합니다!`);
+      
+      // 스크롤이 도착하는 시점(400ms)에 맞추어 토스트 띄우기
+      setTimeout(() => {
+        showToastMessage(`${nextCycle}번째 복습 사이클이 시작되었습니다!`);
+      }, 400);
     }
 
     // 3. 다음 카드로 스크롤 이동
