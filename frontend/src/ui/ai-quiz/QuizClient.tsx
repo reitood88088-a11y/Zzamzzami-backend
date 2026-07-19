@@ -86,7 +86,7 @@ export default function QuizClient() {
       />
 
       {!isShowingInsight ? (
-        <div className="flex-1 flex flex-col mt-[40px] animate-in fade-in slide-in-from-right-4 duration-300">
+        <div className="w-full flex flex-col flex-grow shrink-0 mt-[40px] animate-in fade-in slide-in-from-right-4 duration-300">
           <h2 className="text-[#1A1A1A] text-[26px] font-bold leading-[1.35] tracking-[-0.3px] mb-8">
             {currentQuiz.question}
           </h2>
@@ -121,8 +121,8 @@ export default function QuizClient() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col mt-[40px] animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="flex-1 bg-[#E5DEFA] rounded-[24px] p-[32px] flex flex-col justify-center">
+        <div className="w-full flex flex-col flex-grow shrink-0 mt-[40px] animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="w-full flex flex-col flex-grow shrink-0 bg-[#E5DEFA] rounded-[24px] p-[32px] justify-center">
             <div className="flex items-center gap-[8px] mb-[24px]">
               <Lightbulb size={24} className="text-primary fill-primary/20" />
               <h3 className="text-primary text-[20px] font-bold">인사이트</h3>
