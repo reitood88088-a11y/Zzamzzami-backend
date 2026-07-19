@@ -50,6 +50,11 @@ def get_words_review(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/debug_version")
+def debug_version():
+    return {"version": "v3_no_know_filter"}
+
+
 @router.post("/status")
 def update_word_status(
     request: WordStatusUpdateRequest,
