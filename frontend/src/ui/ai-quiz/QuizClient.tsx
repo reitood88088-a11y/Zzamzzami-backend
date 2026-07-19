@@ -78,7 +78,7 @@ export default function QuizClient() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col px-[24px] pt-[24px] pb-[40px] bg-[#F7F4EE] overflow-y-auto">
+    <div className="w-full h-full flex flex-col px-[24px] pt-[24px] pb-[40px] bg-[#F7F4EE]">
       <StoryProgressBar 
         totalSegments={quizzes.length} 
         currentIndex={currentIndex} 
@@ -86,7 +86,7 @@ export default function QuizClient() {
       />
 
       {!isShowingInsight ? (
-        <div className="w-full flex flex-col flex-grow shrink-0 mt-[40px] animate-in fade-in slide-in-from-right-4 duration-300">
+        <div className="flex-1 min-h-0 flex flex-col mt-[40px] overflow-y-auto animate-in fade-in slide-in-from-right-4 duration-300">
           <h2 className="text-[#1A1A1A] text-[26px] font-bold leading-[1.35] tracking-[-0.3px] mb-8">
             {currentQuiz.question}
           </h2>
@@ -110,7 +110,7 @@ export default function QuizClient() {
                   key={`opt-${idx}`}
                   onClick={() => handleOptionClick(opt)}
                   className={clsx(
-                    "w-full px-[24px] py-[18px] rounded-[50px] text-left text-[18px] leading-[1.45] tracking-[-0.2px] transition-all duration-200 shadow-none",
+                    "w-full shrink-0 px-[24px] py-[18px] rounded-[50px] text-left text-[18px] leading-[1.45] tracking-[-0.2px] transition-all duration-200 shadow-none",
                     buttonStyleClass
                   )}
                 >
@@ -121,9 +121,9 @@ export default function QuizClient() {
           </div>
         </div>
       ) : (
-        <div className="w-full flex flex-col flex-grow shrink-0 mt-[40px] animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="w-full flex flex-col flex-grow shrink-0 bg-[#E5DEFA] rounded-[24px] p-[32px] justify-center">
-            <div className="flex items-center gap-[8px] mb-[24px]">
+        <div className="flex-1 min-h-0 flex flex-col mt-[40px] animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex-1 min-h-0 overflow-y-auto bg-[#E5DEFA] rounded-[24px] p-[32px] flex flex-col">
+            <div className="flex shrink-0 items-center gap-[8px] mb-[24px]">
               <Lightbulb size={24} className="text-primary fill-primary/20" />
               <h3 className="text-primary text-[20px] font-bold">인사이트</h3>
             </div>
