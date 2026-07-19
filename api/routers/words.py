@@ -19,10 +19,7 @@ def get_words_review(
     session: Session = Depends(get_session)
 ):
     try:
-        user = session.exec(select(User)).first()
-
         # DB 서버 기준 NOW() - 24h 사용 (raw text) → Python/Vercel 타임존 불일치 문제 완전 방지
-        # 방법 확인: text("words.created_at >= NOW() - INTERVAL '24 hours'")
         query = select(Word, Diary).join(Diary, Word.diary_id == Diary.id).where(
             text("words.created_at >= NOW() - INTERVAL '24 hours'")
         )
@@ -30,13 +27,8 @@ def get_words_review(
         if subject:
             query = query.where(Diary.subject == subject)
 
-        if user:
-            # Exclude words marked as 'KNOW' by this user
-            subq = select(UserWordStatus.word_id).where(
-                UserWordStatus.user_id == user.id,
-                UserWordStatus.status == WordStatusType.KNOW
-            )
-            query = query.where(Word.id.notin_(subq))
+        # KNOW 필터 제거 → 탭 재진입 시 항상 오늘 단어 전체를 새로 로드
+        # updateWordStatus는 통계/대시보드 집계 목적으로만 사용
 
         query = query.order_by(Word.created_at.desc())
         results = session.exec(query).all()
