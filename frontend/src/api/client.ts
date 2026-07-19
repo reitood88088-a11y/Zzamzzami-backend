@@ -46,8 +46,9 @@ export async function deleteDiary(id: string) {
 }
 
 // 3. 복습 단어
-export async function getReviewWords(subject: string) {
-  return fetchApi(`/words/review?subject=${subject}`);
+export async function getReviewWords(subject?: string) {
+  const query = subject ? `?subject=${subject}` : '';
+  return fetchApi(`/words/review${query}`);
 }
 
 // 4. 단어 상태 업데이트

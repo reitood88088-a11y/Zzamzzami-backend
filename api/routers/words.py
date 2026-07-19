@@ -4,6 +4,9 @@ from sqlmodel import Session, select
 from ..database import get_session
 from ..models import WordStatusType, Word, UserWordStatus, User, Diary
 
+from typing import Optional
+from datetime import datetime, timedelta, timezone
+
 router = APIRouter(prefix="/words", tags=["Words"])
 
 class WordStatusUpdateRequest(BaseModel):
@@ -12,12 +15,28 @@ class WordStatusUpdateRequest(BaseModel):
 
 @router.get("/review")
 def get_words_review(
-    subject: str = Query(...),
+    subject: Optional[str] = Query(None),
     session: Session = Depends(get_session)
 ):
     try:
-        # Get words belonging to diaries of a specific subject
-        query = select(Word, Diary).join(Diary).where(Diary.subject == subject).order_by(Word.created_at.desc())
+        user = session.query(User).first()
+        twenty_four_hours_ago = datetime.now(timezone.utc) - timedelta(hours=24)
+        
+        # Get words within 24 hours
+        query = select(Word, Diary).join(Diary).where(Word.created_at >= twenty_four_hours_ago)
+        
+        if subject:
+            query = query.where(Diary.subject == subject)
+            
+        if user:
+            # Exclude words marked as 'KNOW' by this user
+            subq = select(UserWordStatus.word_id).where(
+                UserWordStatus.user_id == user.id,
+                UserWordStatus.status == WordStatusType.KNOW
+            )
+            query = query.where(Word.id.notin_(subq))
+            
+        query = query.order_by(Word.created_at.desc())
         results = session.exec(query).all()
         
         return {
@@ -26,6 +45,7 @@ def get_words_review(
                 {
                     "wordId": str(word.id),
                     "diaryId": str(diary.id),
+                    "subject": diary.subject.value if hasattr(diary.subject, 'value') else diary.subject,
                     "word": word.word,
                     "meaning": word.meaning,
                     "exampleSentence": word.example_sentence

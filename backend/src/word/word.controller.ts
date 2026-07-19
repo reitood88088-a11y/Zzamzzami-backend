@@ -10,7 +10,7 @@ export class WordController {
   ) {}
 
   @Get('review')
-  async getReviewWords(@Query('subject') subject: 'English' | 'Chinese' | 'Japanese') {
+  async getReviewWords(@Query('subject') subject?: 'English' | 'Chinese' | 'Japanese') {
     const user = await this.prisma.getDefaultUser();
     if (!user) throw new Error('User not found');
 
@@ -19,6 +19,7 @@ export class WordController {
     const mapped = words.map(w => ({
       wordId: w.id,
       diaryId: w.diaryId,
+      subject: w.diary.subject,
       word: w.word,
       meaning: w.meaning,
       exampleSentence: w.exampleSentence,

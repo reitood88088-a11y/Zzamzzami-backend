@@ -26,7 +26,7 @@ export default function ReelsFeed() {
   useEffect(() => {
     async function loadReviews() {
       try {
-        const res = await getReviewWords('English'); // Hardcode subject for now
+        const res = await getReviewWords(); // Fetch all languages
         
         // 중복 방지를 위한 Map (단어 뜻 동일하면 하나만)
         const uniqueWords = new Map<string, StudyItem>();
@@ -35,7 +35,7 @@ export default function ReelsFeed() {
             uniqueWords.set(w.word.toLowerCase().trim(), {
               id: w.wordId,
               originalId: w.wordId,
-              language: 'English',
+              language: w.subject || 'English',
               timestamp: 'Just now',
               word: w.word,
               meaning: w.meaning,

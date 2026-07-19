@@ -5,24 +5,19 @@ import { PrismaService } from '../prisma/prisma.service';
 export class WordService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getReviewWords(userId: string, subject: 'English' | 'Chinese' | 'Japanese') {
+  async getReviewWords(userId: string, subject?: 'English' | 'Chinese' | 'Japanese') {
     const now = new Date();
-    
-    const startOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-    startOfYesterday.setHours(0, 0, 0, 0);
-
-    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    endOfToday.setHours(23, 59, 59, 999);
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     return this.prisma.word.findMany({
       where: {
         diary: {
           userId,
-          subject,
+          ...(subject ? { subject } : {}),
         },
         createdAt: {
-          gte: startOfYesterday,
-          lte: endOfToday,
+          gte: twentyFourHoursAgo,
+          lte: now,
         },
         userStatuses: {
           none: {
@@ -32,6 +27,7 @@ export class WordService {
         },
       },
       include: {
+        diary: true,
         userStatuses: {
           where: { userId }
         }
