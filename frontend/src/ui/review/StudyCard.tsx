@@ -6,6 +6,7 @@ export interface StudyItem {
   language: string;
   timestamp: string;
   word: string;
+  reading: string;  // 한어병음(중국어) 또는 히라가나(일본어)
   meaning: string;
   example: string;
 }
@@ -15,15 +16,17 @@ interface StudyCardProps {
 }
 
 export default function StudyCard({ item }: StudyCardProps) {
-  // 발음 기호(한어병음, 히라가나 등)가 괄호로 끝에 포함되어 있는지 파싱
-  // 예: "汉字 (hàn zì)" -> mainWord: "汉字", reading: "hàn zì"
+  // reading 필드를 우선 사용, 없으면 word에서 괄호 패턴 파싱 (기존 데이터 호환)
   let mainWord = item.word;
-  let reading = "";
+  let reading = item.reading || "";
   
-  const match = item.word.match(/^(.*?)\s*\((.*?)\)$/);
-  if (match) {
-    mainWord = match[1].trim();
-    reading = match[2].trim();
+  if (!reading) {
+    // Fallback: 기존 "汉字 (hàn zì)" 형식 파싱 (반각/전각 괄호 모두 지원)
+    const match = item.word.match(/^(.*?)\s*[（(](.*?)[）)]\s*$/);
+    if (match) {
+      mainWord = match[1].trim();
+      reading = match[2].trim();
+    }
   }
 
   return (

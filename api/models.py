@@ -44,6 +44,7 @@ class Word(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     diary_id: uuid.UUID = Field(foreign_key="diaries.id")
     word: str
+    reading: Optional[str] = Field(default=None)  # 한어병음(중국어) 또는 히라가나(일본어)
     meaning: str
     example_sentence: Optional[str] = None
     created_at: datetime = Field(default_factory=get_utcnow)

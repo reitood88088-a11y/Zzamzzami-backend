@@ -48,6 +48,7 @@ async def scan_document(
             word_obj = Word(
                 diary_id=diary.id,
                 word=w.get("word", ""),
+                reading=w.get("reading", "") or None,  # 빈 문자열은 None으로 저장
                 meaning=w.get("meaning", ""),
                 example_sentence=w.get("example_sentence", "")
             )

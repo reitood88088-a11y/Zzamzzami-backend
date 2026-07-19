@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from pydantic import BaseModel
 from sqlmodel import Session, select
+from sqlalchemy import text
 from ..database import get_session
 from ..models import WordStatusType, Word, UserWordStatus, User, Diary
 
 from typing import Optional
-from datetime import datetime, timedelta, timezone
 
 router = APIRouter(prefix="/words", tags=["Words"])
 
@@ -19,16 +19,17 @@ def get_words_review(
     session: Session = Depends(get_session)
 ):
     try:
-        user = session.query(User).first()
-        # Convert to naive UTC datetime to match TIMESTAMP WITHOUT TIME ZONE in Postgres
-        twenty_four_hours_ago = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(hours=24)
-        
-        # Get words within 24 hours
-        query = select(Word, Diary).join(Diary).where(Word.created_at >= twenty_four_hours_ago)
-        
+        user = session.exec(select(User)).first()
+
+        # DB 서버 기준 NOW() - 24h 사용 (raw text) → Python/Vercel 타임존 불일치 문제 완전 방지
+        # 방법 확인: text("words.created_at >= NOW() - INTERVAL '24 hours'")
+        query = select(Word, Diary).join(Diary, Word.diary_id == Diary.id).where(
+            text("words.created_at >= NOW() - INTERVAL '24 hours'")
+        )
+
         if subject:
             query = query.where(Diary.subject == subject)
-            
+
         if user:
             # Exclude words marked as 'KNOW' by this user
             subq = select(UserWordStatus.word_id).where(
@@ -36,10 +37,10 @@ def get_words_review(
                 UserWordStatus.status == WordStatusType.KNOW
             )
             query = query.where(Word.id.notin_(subq))
-            
+
         query = query.order_by(Word.created_at.desc())
         results = session.exec(query).all()
-        
+
         return {
             "success": True,
             "data": [
@@ -48,6 +49,7 @@ def get_words_review(
                     "diaryId": str(diary.id),
                     "subject": diary.subject.value if hasattr(diary.subject, 'value') else diary.subject,
                     "word": word.word,
+                    "reading": word.reading or "",  # 한어병음 또는 히라가나
                     "meaning": word.meaning,
                     "exampleSentence": word.example_sentence
                 } for word, diary in results
@@ -63,7 +65,7 @@ def update_word_status(
 ):
     try:
         # Dummy user (since auth is not fully implemented)
-        user = session.query(User).first()
+        user = session.exec(select(User)).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
             

@@ -38,6 +38,7 @@ export default function ReelsFeed() {
               language: w.subject || 'English',
               timestamp: 'Just now',
               word: w.word,
+              reading: w.reading || '',
               meaning: w.meaning,
               example: w.exampleSentence || ''
             });
