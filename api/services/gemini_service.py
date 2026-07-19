@@ -15,7 +15,22 @@ def process_diary_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> di
        - If the language is Chinese, provide the pinyin romanization in the "reading" field (e.g., "hàn zì").
        - If the language is Japanese, provide the hiragana reading in the "reading" field (e.g., "かんじ").
        - If the language is English, the "reading" field should be an empty string "".
-    4. Generate 3 multiple-choice questions based on the content of the text to test reading comprehension. Each question must have exactly 4 options.
+    4. Generate exactly 3 multiple-choice questions (4 options each) based on the EXTRACTED WORDS. Mix the following two types of quizzes:
+       
+       [Type 1: Synonym Quiz]
+       - Question: Ask to find a word that has the same meaning as one of the extracted words.
+       - Options: 1 correct synonym, 3 clearly incorrect words. The incorrect words MUST have completely different meanings from the answer. Do not use words with similar meanings as distractors.
+       - Explanation: MUST explicitly mention the extracted word, provide its synonym (the correct answer), and provide an antonym for additional learning.
+       
+       [Type 2: Morphological/Visual Similarity Quiz]
+       - Question: Provide the Korean meaning of one of the extracted words and ask which word it is.
+       - Options: 1 correct word (the extracted word), 3 visually or morphologically similar distractors that have completely different meanings.
+         * English: Use prefix/suffix variations or spelling tricks (e.g., affect vs effect/infect/defect).
+         * Chinese: Use words with the same phonetic component but different radicals (e.g., 渴 vs 喝/褐).
+         * Japanese: Use similar looking kanji or homophones (e.g., 待つ vs 持つ).
+       - Explanation: Explain the meaning of the correct answer and the distractors to clarify the confusion.
+
+       Ensure there is a total of exactly 3 quizzes in the "quizzes" array.
     
     Return the response ONLY as a raw JSON object (without Markdown code blocks like ```json) that exactly matches this format:
     {
@@ -27,10 +42,10 @@ def process_diary_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> di
       ],
       "quizzes": [
         {
-          "question": "What is the main topic?",
-          "options": ["A", "B", "C", "D"],
+          "question": "What is a synonym for 'affect'?",
+          "options": ["influence", "apple", "car", "dog"],
           "correct_option_index": 0,
-          "explanation": "Because A is the answer."
+          "explanation": "'influence' is a synonym for 'affect'. An antonym would be 'remain'."
         }
       ]
     }
