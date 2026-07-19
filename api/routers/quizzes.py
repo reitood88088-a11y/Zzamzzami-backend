@@ -39,7 +39,7 @@ from ..models import Word
 def regenerate_all_quizzes(session: Session = Depends(get_session)):
     try:
         genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-        model = genai.GenerativeModel('gemini-2.0-flash')
+        model = genai.GenerativeModel('gemini-flash-latest')
         
         diaries = session.exec(select(Diary)).all()
         for row in diaries:
