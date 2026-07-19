@@ -8,7 +8,7 @@ interface StoryProgressBarProps {
 
 export default function StoryProgressBar({ totalSegments, currentIndex, isShowingInsight }: StoryProgressBarProps) {
   return (
-    <div className="flex w-full gap-[4px] h-[4px]">
+    <div className="flex shrink-0 w-full gap-[4px] h-[4px]">
       {Array.from({ length: totalSegments }).map((_, i) => {
         let bgStyle = {};
         
