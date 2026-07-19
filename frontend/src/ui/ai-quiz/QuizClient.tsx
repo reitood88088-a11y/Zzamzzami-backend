@@ -78,7 +78,7 @@ export default function QuizClient() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col px-[24px] pt-[24px] pb-[40px] bg-[#F7F4EE]">
+    <div className="w-full h-full flex flex-col px-[24px] pt-[24px] pb-[40px] bg-[#F7F4EE] overflow-y-auto">
       <StoryProgressBar 
         totalSegments={quizzes.length} 
         currentIndex={currentIndex} 
@@ -145,7 +145,7 @@ export default function QuizClient() {
 
           <button 
             onClick={handleNext}
-            className="w-full mt-[24px] py-[18px] bg-primary rounded-[50px] text-white text-[18px] font-bold flex items-center justify-center gap-2 shadow-none active:scale-95 transition-transform"
+            className="w-full shrink-0 mt-[24px] py-[18px] bg-primary rounded-[50px] text-white text-[18px] font-bold flex items-center justify-center gap-2 shadow-none active:scale-95 transition-transform"
           >
             {currentIndex === quizzes.length - 1 ? '완료' : '다음 문제'} <ArrowRight size={20} />
           </button>
