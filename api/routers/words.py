@@ -20,7 +20,8 @@ def get_words_review(
 ):
     try:
         user = session.query(User).first()
-        twenty_four_hours_ago = datetime.now(timezone.utc) - timedelta(hours=24)
+        # Convert to naive UTC datetime to match TIMESTAMP WITHOUT TIME ZONE in Postgres
+        twenty_four_hours_ago = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(hours=24)
         
         # Get words within 24 hours
         query = select(Word, Diary).join(Diary).where(Word.created_at >= twenty_four_hours_ago)
