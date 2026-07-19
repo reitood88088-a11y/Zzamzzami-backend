@@ -12,10 +12,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="h-full antialiased bg-gray-100">
-      <body className="min-h-full flex flex-col items-center justify-center">
+    <html lang="ko" className="h-[100dvh] antialiased bg-gray-100 overflow-hidden overscroll-none">
+      <body className="h-full flex flex-col items-center justify-center overflow-hidden overscroll-none m-0 p-0">
         {/* 모바일 화면 래퍼 (Mobile Wrapper) */}
-        <div className="w-full h-full sm:w-[390px] sm:h-[844px] bg-background sm:shadow-2xl sm:rounded-[40px] overflow-hidden relative">
+        <div className="w-full h-full sm:w-[390px] sm:h-[844px] bg-background sm:shadow-2xl sm:rounded-[40px] overflow-hidden relative flex flex-col">
           {children}
         </div>
       </body>
