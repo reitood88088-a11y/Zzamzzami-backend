@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlmodel import Session, select
+from datetime import datetime, timedelta
 from ..database import get_session
 from ..models import Quiz, Diary
 
@@ -11,7 +12,11 @@ def get_quizzes(
     session: Session = Depends(get_session)
 ):
     try:
-        query = select(Quiz, Diary).join(Diary).where(Diary.subject == subject).order_by(Quiz.created_at.desc())
+        twenty_four_hours_ago = datetime.utcnow() - timedelta(hours=24)
+        query = select(Quiz, Diary).join(Diary).where(
+            Diary.subject == subject,
+            Diary.created_at >= twenty_four_hours_ago
+        ).order_by(Quiz.created_at.desc())
         results = session.exec(query).all()
         
         return {
