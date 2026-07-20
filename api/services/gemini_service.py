@@ -5,7 +5,8 @@ import json
 def process_diary_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
     genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
     
-    models_to_try = ['gemini-flash-latest']
+    # gemini-2.5-flash is much more reliable and robust for structured outputs and OCR
+    models_to_try = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-flash-latest']
     last_exception = None
     
     prompt = """
@@ -32,22 +33,25 @@ def process_diary_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> di
     for model_name in models_to_try:
         try:
             model = genai.GenerativeModel(model_name)
-            response = model.generate_content([
-                {'mime_type': mime_type, 'data': image_bytes},
-                prompt
-            ])
+            response = model.generate_content(
+                [{'mime_type': mime_type, 'data': image_bytes}, prompt],
+                generation_config={"response_mime_type": "application/json"}
+            )
             
-            # Parse the response as JSON
             text_response = response.text.strip()
-            if text_response.startswith("```json"):
-                text_response = text_response[7:]
-            if text_response.startswith("```"):
-                text_response = text_response[3:]
-            if text_response.endswith("```"):
-                text_response = text_response[:-3]
-            text_response = text_response.strip()
             
+            # Robust JSON extraction
+            start = text_response.find('{')
+            end = text_response.rfind('}')
+            if start != -1 and end != -1:
+                text_response = text_response[start:end+1]
+                
             data = json.loads(text_response)
+            
+            # Basic validation
+            if "language" not in data or "full_text" not in data or "words" not in data:
+                raise ValueError(f"Missing required fields in response from {model_name}")
+                
             return data
             
         except Exception as e:
