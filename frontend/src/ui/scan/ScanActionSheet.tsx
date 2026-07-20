@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { uploadScan } from '../../api/client';
+import { compressImage } from '../../utils/image';
 
 export default function ScanActionSheet() {
   const router = useRouter();
@@ -15,7 +16,8 @@ export default function ScanActionSheet() {
 
     setIsScanning(true);
     try {
-      await uploadScan(file, 'English');
+      const compressedFile = await compressImage(file);
+      await uploadScan(compressedFile, 'English');
       router.push('/home');
     } catch (err) {
       console.error('Scan failed:', err);
