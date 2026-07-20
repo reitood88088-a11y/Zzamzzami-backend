@@ -59,6 +59,33 @@ export class DiaryService {
     if (!diary || diary.userId !== userId) {
       throw new Error('Diary not found or unauthorized');
     }
+
+    // Delete related records manually to prevent foreign key constraint violations
+    // if the physical database was created without ON DELETE CASCADE
+    
+    // 1. Delete UserWordStatus associated with the words of this diary
+    const words = await this.prisma.word.findMany({ where: { diaryId } });
+    const wordIds = words.map(w => w.id);
+    if (wordIds.length > 0) {
+      await this.prisma.userWordStatus.deleteMany({
+        where: { wordId: { in: wordIds } }
+      });
+    }
+
+    // 2. Delete QuizAttempts associated with the quizzes of this diary
+    const quizzes = await this.prisma.quiz.findMany({ where: { diaryId } });
+    const quizIds = quizzes.map(q => q.id);
+    if (quizIds.length > 0) {
+      await this.prisma.quizAttempt.deleteMany({
+        where: { quizId: { in: quizIds } }
+      });
+    }
+
+    // 3. Delete Words and Quizzes
+    await this.prisma.word.deleteMany({ where: { diaryId } });
+    await this.prisma.quiz.deleteMany({ where: { diaryId } });
+
+    // 4. Finally delete the Diary
     return this.prisma.diary.delete({ where: { id: diaryId } });
   }
 }
