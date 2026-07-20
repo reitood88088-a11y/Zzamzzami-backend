@@ -27,8 +27,7 @@ def get_quizzes(
         if not user:
             return {"success": True, "data": []}
             
-        from datetime import timezone
-        twenty_four_hours_ago = datetime.now(timezone.utc) - timedelta(hours=24)
+        twenty_four_hours_ago = datetime.utcnow() - timedelta(hours=24)
         
         diary_query = select(Diary).where(
             Diary.user_id == user.id,
@@ -67,7 +66,9 @@ def get_quizzes(
                 You are an AI assistant for a language learning app. Language: {d.subject if d.subject != 'ALL' else 'Mixed'}
                 Extracted Words: {json.dumps(word_list, ensure_ascii=False)}
 
-                Generate exactly 3 multiple-choice questions (4 options each) based on the EXTRACTED WORDS. Mix the following two types of quizzes:
+                Generate a multiple-choice question (4 options each) for EVERY SINGLE WORD in the EXTRACTED WORDS list. 
+                If there are N extracted words, you MUST generate exactly N questions, ensuring every word has its own dedicated question.
+                Mix the following two types of quizzes:
                    [Type 1: Synonym Quiz]
                    - Question: Ask to find a word that has the same meaning as one of the extracted words.
                    - Options: 1 correct synonym, 3 clearly incorrect words. The incorrect words MUST have completely different meanings from the answer. Do not use words with similar meanings as distractors.
@@ -81,7 +82,7 @@ def get_quizzes(
                      * Japanese: Use similar looking kanji or homophones (e.g., 待つ vs 持つ).
                    - Explanation: Explain the meaning of the correct answer and the distractors to clarify the confusion.
 
-                Ensure there is a total of exactly 3 quizzes in the "quizzes" array. Return ONLY a JSON array of quizzes, exactly matching this format:
+                Return ONLY a JSON array of quizzes, exactly matching this format:
                 [
                   {{
                     "question": "What is a synonym for 'affect'?",
@@ -124,7 +125,7 @@ def get_quizzes(
                     import random
                     fallback_quizzes = []
                     if len(word_list) > 0:
-                        for i in range(min(3, len(word_list))):
+                        for i in range(len(word_list)):
                             w = word_list[i]
                             fallback_quizzes.append({
                                 "question": f"'{w['word']}'의 뜻으로 알맞은 것은?",
