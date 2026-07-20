@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { reportStudyTime } from '../api/client';
 
-export function useStudyTimeTracker(subject: 'English' | 'Chinese' | 'Japanese' | null) {
+export function useStudyTimeTracker(subject: 'English' | 'Chinese' | 'Japanese' | 'ALL' | null) {
   const accumulatedTimeRef = useRef(0);
 
   useEffect(() => {
