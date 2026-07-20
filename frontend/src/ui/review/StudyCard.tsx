@@ -62,7 +62,7 @@ export default function StudyCard({ item }: StudyCardProps) {
               {item.meaning}
             </p>
             <p className="text-[#666666] text-[18px] font-normal leading-[1.45] tracking-[-0.2px] italic">
-              "{item.example}"
+              &quot;{item.example}&quot;
             </p>
           </div>
         </div>

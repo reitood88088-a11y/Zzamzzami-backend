@@ -124,7 +124,7 @@ export default function QuoteWidget() {
         <Quote size={18} className="text-[#E5DEFA] absolute top-[8px] left-[12px]" />
         
         <p className="text-[#1A1A1A] text-[13px] font-medium leading-[1.4] text-center px-[20px]">
-          "{currentQuote.text}"
+          &quot;{currentQuote.text}&quot;
         </p>
         
         {/* 사용자가 쓴 명언일 경우 삭제 아이콘 표시 */}
