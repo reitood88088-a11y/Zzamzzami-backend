@@ -19,6 +19,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     await this.$connect();
 
     // Auto-migrate tables if they don't exist (helpful when prisma db push hasn't been run)
+    /*
     try {
       await this.$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS user_quote (
@@ -44,8 +45,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     } catch (err) {
       console.log('Skipping auto-migration, tables might already exist or DB restricted:', err.message);
     }
+    */
 
     // Ensure default user exists (for personal use)
+    /*
     const defaultUserEmail = 'personal@zzamzzami.app';
     const user = await this.user.findUnique({ where: { email: defaultUserEmail } });
     if (!user) {
@@ -56,6 +59,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         },
       });
     }
+    */
   }
 
   async getDefaultUser() {
