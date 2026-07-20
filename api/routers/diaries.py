@@ -53,6 +53,7 @@ def delete_diary(
             for status in statuses:
                 session.delete(status)
             session.delete(word)
+        session.flush()
 
         # 3. 다이어리에 속한 퀴즈(Quiz)와 연관된 기록(QuizAttempt) 삭제
         quizzes = session.exec(select(Quiz).where(Quiz.diary_id == diary_id)).all()
@@ -61,6 +62,7 @@ def delete_diary(
             for attempt in attempts:
                 session.delete(attempt)
             session.delete(quiz)
+        session.flush()
             
         # 4. 다이어리 본체 삭제
         session.delete(diary)
