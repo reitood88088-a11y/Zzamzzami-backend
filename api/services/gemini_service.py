@@ -5,7 +5,7 @@ import json
 def process_diary_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
     genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
     
-    models_to_try = ['gemini-2.5-flash', 'gemini-2.5-pro']
+    models_to_try = ['gemini-flash-latest']
     last_exception = None
     
     prompt = """
