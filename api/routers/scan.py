@@ -54,17 +54,6 @@ async def scan_document(
             )
             session.add(word_obj)
             
-        # 생성된 퀴즈 DB 저장
-        for q in result.get("quizzes", []):
-            quiz_obj = Quiz(
-                diary_id=diary.id,
-                question=q.get("question", ""),
-                options=q.get("options", []),
-                correct_option_index=q.get("correct_option_index", 0),
-                explanation=q.get("explanation", "")
-            )
-            session.add(quiz_obj)
-            
         session.commit()
         
         return {

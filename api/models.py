@@ -74,3 +74,20 @@ class QuizAttempt(SQLModel, table=True):
     quiz_id: uuid.UUID = Field(foreign_key="quizzes.id")
     is_correct: bool
     created_at: datetime = Field(default_factory=get_utcnow)
+
+class DailyStudyTime(SQLModel, table=True):
+    __tablename__ = "daily_study_time"
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="users.id")
+    subject: SubjectType
+    date: datetime_date
+    duration_seconds: int = Field(default=0)
+    created_at: datetime = Field(default_factory=get_utcnow)
+    updated_at: datetime = Field(default_factory=get_utcnow)
+
+class UserQuote(SQLModel, table=True):
+    __tablename__ = "user_quote"
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="users.id")
+    text: str
+    created_at: datetime = Field(default_factory=get_utcnow)

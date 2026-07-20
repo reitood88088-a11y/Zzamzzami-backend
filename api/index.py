@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import scan, diaries, words, quizzes, dashboard
+from .routers import scan, diaries, words, quizzes, dashboard, quotes
 
 app = FastAPI(
     title="Zzamzzami API",
@@ -24,6 +24,7 @@ app.include_router(diaries.router, prefix="/api/v1")
 app.include_router(words.router, prefix="/api/v1")
 app.include_router(quizzes.router, prefix="/api/v1")
 app.include_router(dashboard.router, prefix="/api/v1")
+app.include_router(quotes.router, prefix="/api/v1")
 
 from fastapi.responses import RedirectResponse
 
