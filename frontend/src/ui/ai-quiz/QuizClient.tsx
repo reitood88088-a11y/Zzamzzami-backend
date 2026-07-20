@@ -13,14 +13,21 @@ export default function QuizClient() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isShowingInsight, setIsShowingInsight] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Hardcode language for now, just like getQuizzes('English')
-  useStudyTimeTracker('English');
+  useStudyTimeTracker('ALL');
 
   useEffect(() => {
     async function loadQuizzes() {
       try {
-        const res = await getQuizzes('English'); // Hardcode subject for now
+        const res = await getQuizzes('ALL');
+        
+        if (res.success === false) {
+          setErrorMessage(res.message || "퀴즈를 불러오지 못했습니다.");
+          setQuizzes([]);
+          return;
+        }
+
         const mapped = res.data.map((q: any) => ({
           id: q.quizId,
           question: q.question,
@@ -73,8 +80,12 @@ export default function QuizClient() {
     return <div className="w-full h-full flex items-center justify-center bg-[#F7F4EE] text-[#999]">퀴즈를 불러오는 중...</div>;
   }
 
+  if (errorMessage) {
+    return <div className="w-full h-full flex items-center justify-center bg-[#F7F4EE] text-[#EF4444] font-bold text-center px-4">{errorMessage}</div>;
+  }
+
   if (quizzes.length === 0) {
-    return <div className="w-full h-full flex items-center justify-center bg-[#F7F4EE] text-[#999]">오늘의 퀴즈가 없습니다!</div>;
+    return <div className="w-full h-full flex items-center justify-center bg-[#F7F4EE] text-[#999]">오늘의 퀴즈가 없습니다! (먼저 다이어리를 스캔해주세요)</div>;
   }
 
   return (

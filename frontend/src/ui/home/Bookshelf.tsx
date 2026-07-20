@@ -28,7 +28,7 @@ export default function Bookshelf({ subject, diaries, isEven }: BookshelfProps) 
       </div>
 
       {/* 책 리스트 가로 스와이프 (Peeking UI 적용) */}
-      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory px-6 pb-2 no-scrollbar min-h-[140px] items-center">
+      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory px-6 scroll-pl-6 pb-2 no-scrollbar min-h-[140px] items-center">
         {diaries.length > 0 ? (
           <>
             {diaries.map((diary) => (

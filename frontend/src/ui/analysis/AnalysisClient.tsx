@@ -45,14 +45,14 @@ export default function AnalysisClient() {
 
   // Use real data from API for stats
   const stats: StatsData = {
-    wordsLearned: dashboardData.wordsLearned || 0,
-    quizAccuracy: dashboardData.quizAccuracy || 0,
+    wordsLearned: dashboardData.wordsLearned ? (typeof dashboardData.wordsLearned === 'object' ? dashboardData.wordsLearned[selectedTab] : dashboardData.wordsLearned) : 0,
+    quizAccuracy: dashboardData.quizAccuracy ? (typeof dashboardData.quizAccuracy === 'object' ? dashboardData.quizAccuracy[selectedTab] : dashboardData.quizAccuracy) : 0,
     streakDays: dashboardData.consecutiveDays || 0,
   };
 
   // Use real data from API for charts based on selected tab
   const chartData = dashboardData.weeklyChart ? dashboardData.weeklyChart[selectedTab] || [] : [];
-  const hoursSaved = dashboardData.hoursSaved || 0;
+  const hoursSaved = dashboardData.hoursSaved ? (typeof dashboardData.hoursSaved === 'object' ? dashboardData.hoursSaved[selectedTab] : dashboardData.hoursSaved) : 0;
 
   return (
     <div className="w-full h-full flex flex-col px-[20px] pt-[20px] pb-[40px] bg-[#F7F4EE] overflow-y-auto no-scrollbar gap-[16px]">
