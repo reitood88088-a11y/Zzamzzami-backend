@@ -19,10 +19,12 @@ def process_diary_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> di
        - If the language is Japanese, provide the hiragana reading in the "reading" field (e.g., "かんじ").
        - If the language is English, the "reading" field should be an empty string "".
     
+    CRITICAL: Ensure all string values in your JSON are properly escaped. If the extracted text contains double quotes, you MUST escape them (e.g., \\"Hello\\").
+    
     Return the response ONLY as a raw JSON object (without Markdown code blocks like ```json) that exactly matches this format:
     {
       "language": "English",
-      "full_text": "extracted text here",
+      "full_text": "extracted text here with escaped \\"quotes\\" if any",
       "words": [
         {"word": "example", "reading": "", "meaning": "예시", "example_sentence": "This is an example."},
         {"word": "汉字", "reading": "hàn zì", "meaning": "한자", "example_sentence": "汉字很难写。"}
@@ -31,33 +33,37 @@ def process_diary_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> di
     """
     
     for model_name in models_to_try:
-        try:
-            model = genai.GenerativeModel(model_name)
-            response = model.generate_content(
-                [{'mime_type': mime_type, 'data': image_bytes}, prompt],
-                generation_config={"response_mime_type": "application/json"}
-            )
-            
-            text_response = response.text.strip()
-            
-            # Robust JSON extraction
-            start = text_response.find('{')
-            end = text_response.rfind('}')
-            if start != -1 and end != -1:
-                text_response = text_response[start:end+1]
+        for attempt in range(2): # Try each model up to 2 times
+            try:
+                model = genai.GenerativeModel(model_name)
+                response = model.generate_content(
+                    [{'mime_type': mime_type, 'data': image_bytes}, prompt],
+                    generation_config={"response_mime_type": "application/json"}
+                )
                 
-            data = json.loads(text_response)
-            
-            # Basic validation
-            if "language" not in data or "full_text" not in data or "words" not in data:
-                raise ValueError(f"Missing required fields in response from {model_name}")
+                text_response = response.text.strip()
                 
-            return data
-            
-        except Exception as e:
-            print(f"[{model_name}] Error or Quota exceeded. Falling back... Details: {e}")
-            last_exception = e
-            continue # Try next model
+                # Robust JSON extraction
+                start = text_response.find('{')
+                end = text_response.rfind('}')
+                if start != -1 and end != -1:
+                    text_response = text_response[start:end+1]
+                    
+                data = json.loads(text_response)
                 
-    # If all models fail with quota errors
+                # Basic validation
+                if "language" not in data or "full_text" not in data or "words" not in data:
+                    raise ValueError(f"Missing required fields in response from {model_name}")
+                    
+                return data
+                
+            except Exception as e:
+                print(f"[{model_name}] Attempt {attempt + 1} Error: {e}")
+                last_exception = e
+                continue # Retry this model
+                
+        # If both attempts for this model fail, the outer loop continues to the next model
+        print(f"[{model_name}] All attempts failed. Falling back to next model...")
+                
+    # If all models fail
     raise last_exception or Exception("All Gemini models failed.")
